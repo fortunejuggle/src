@@ -40,9 +40,7 @@ Awareness of NFSv4
 
 ##  NFS - The Network File System
 
-The abbreviation NFS expands to *Network File System*. With NFS you can
-make a remote disk (or only some of Configuring SMB Server NFS it) part
-of your local filesystem.
+The abbreviation NFS expands to *Network File System*. With NFS you can make a remote disk (or only the Configurations, what are needed to configure the SMB) part of your local filesystem.
 
 The NFS protocol is being adjusted, a process which has, so far, taken
 several years. This has consequences for those using NFS. Modern NFS
@@ -54,6 +52,7 @@ accepting only protocol version 2 NFS requests, will still be around.
 This section will primarily describe kernel-space NFS-servers supporting
 protocol version 3 and compatible clients. Differences from older
 versions will be pointed out when appropriate.
+
 
 **Note**
 Details about this NFS work-in-progress are in [NFS protocol
@@ -74,10 +73,10 @@ This section describes NFS-related software and its configuration.
 
 To run NFS, the following is needed:
 
--   support for NFS (several options) must be built into the 
+-   support for NFS (several options) must be built into the
     *kernel*
 
--   a *portmapper* must be running 
+-   a *portmapper* must be running
 
 -   on systems with NFS-server support, an *NFS daemon* and a *mount
     daemon* must be active
@@ -96,7 +95,10 @@ contains NFS-server support can also be used as an NFS client.
 The situation described here is valid for the 2.4.*x* kernel series.
 Specifications described here may change in the future.
 
+
 FIXME new kernel versions
+
+[NTFS Kernel Driver](https://www.kernel.org/doc/html/v5.15/filesystems/ntfs.html#the-linux-ntfs-filesystem-driver)
 
 #### NFS-related kernel options
 
@@ -176,7 +178,7 @@ built-in tcpwrapper support). You can test this by running
         libnsl.so.1 => /lib/libnsl.so.1 (0x40020000)
         libc.so.6 => /lib/libc.so.6 (0x40036000)
         /lib/ld-linux.so.2 => /lib/ld-linux.so.2 (0x40000000)
-                        
+
 
 The line with `libwrap.so.0` (libwrap belongs to the tcp wrapper) shows
 that this portmapper is tcp wrapper compiled with tcp-wrapper support.
@@ -191,13 +193,13 @@ Start by editing the file `/etc/hosts.deny` and adding the following
 line:
 
         portmap: ALL
-                    
+
 
 This denies every system access to the portmapper. It can be extended
 with a command:
 
         portmap: ALL: (echo illegal rpc request from %h | mail root) &
-                    
+
 
 Now all portmapper requests are denied. In the second example, requests
 are denied and reported to root.
@@ -206,25 +208,25 @@ The next step is allowing only those systems access that *are* allowed
 to do so. This is done by putting a line in `/etc/hosts.allow`:
 
         portmap: 121.122.123.
-                        
+
 
 This allows each host with an IP address starting with the numbers shown
 to connect to the portmapper and, therefore, use NFS. Another
 possibility is specifying part of a hostname:
 
         portmap: .example.com
-                        
+
 
 This allows all hosts inside the example.com domain to connect. To allow
 all hosts of a NIS workgroup:
 
         portmap: @workstations
-                        
+
 
 To allow hosts with IP addresses in a subnet:
 
         portmap: 192.168.24.16/255.255.255.248
-                        
+
 
 This allows all hosts from 192.168.24.16 to 192.168.24.23 to connect
 (examples from [???](#Zadok01)).
@@ -346,7 +348,7 @@ the host can access it.
 Each line in `/etc/exports` has the following format:
 
             /dir hostname(options) ...
-                        
+
 
 -   Name of the directory to be exported
 
@@ -385,7 +387,7 @@ Each line in `/etc/exports` has the following format:
 -   More than one system with options can be listed:
 
             /home/ftp/pub clientN(rw) *.example.com(ro)
-                                        
+
 
     Explanation: system `clientN` is allowed to read and write in
     `/home/ftp/pub`. Systems in `example.com` are allowed to connect,
@@ -395,12 +397,12 @@ Make sure there is *no space* (not even white) between the hostname and
 the specification between braces. There is a lot of difference between
 
         /home/ftp/pub clientN(rw)
-                                
+
 
 and
 
         /home/ftp/pub clientN (rw)
-                                
+
 
 The first allows `clientN` read and write access. The second allows
 `clientN` access with default options (see `man 5 exports`) and *all
@@ -471,7 +473,7 @@ discussed in detail.
 Example entry in `/etc/exports` on system `nfsshop` (the server system):
 
         /    client5(ro,no_root_squash) *.example.com(ro)
-                            
+
 
 System `nfsshop` allows system `client5` *read-only* access to
 everything and reads by user root are done as root on `nfsshop`. Systems
@@ -489,7 +491,7 @@ Here is an example file:
         / client3.exworks(ro,root_squash)
         / client4.exworks(ro,root_squash)
         /home client9.exworks(ro,root_squash)
-                            
+
 
 Explanation: `client2`, `client3` and `client4` are allowed to mount the
 complete filesystem (`/`: root). But they have read-only access and
@@ -524,7 +526,7 @@ The export list is activated (or reactivated) with the following
 command:
 
         exportfs -r
-                            
+
 
 The `r` originates from the word NFS-r *re-exporting*.
 
@@ -535,7 +537,7 @@ When the export list is activated, the kernel export table will be
 filled. The following command will show the kernel export table:
 
         cat /proc/fs/nfs/exports
-                            
+
 
 The output will look something like:
 
@@ -545,7 +547,7 @@ The output will look something like:
         /home   client9.exworks(ro,root_squash,async,wdelay) # 192.168.72.9
         /   client2.exworks(ro,root_squash,async,wdelay) # 192.168.72.2
         /   client3.exworks(ro,root_squash,async,wdelay) # 192.168.72.3
-                            
+
 
 Explanation: all named hosts are allowed to mount the root directory
 (`client9`: `/home`) of this machine with the listed options. The IP
@@ -563,7 +565,7 @@ with far-reaching consequences.
 All active export entries are unexported with the command:
 
         exportfs -ua
-                            
+
 
 The letters `ua` are an abbreviation for NFS-ua *unexport all*.
 
@@ -595,7 +597,7 @@ showmount lists the currently active export list:
         Export list for nfsshop:
         / client2.exworks,client3.exworks,client4.exworks
         /home client9.exworks
-                            
+
 
 The information is more sparse compared to the output of
 `cat /proc/fs/nfs/exports` shown earlier.
@@ -607,7 +609,7 @@ The information is more sparse compared to the output of
         # showmount
         Hosts on nfsshop:
         client9.exworks
-                            
+
 
 **With the `--directories` option.**
 
@@ -617,7 +619,7 @@ currently mounted by a remote host:
         # showmount --directories
         Directories on nfsshop:
         /home
-                            
+
 
 **With the `--all` option.**
 
@@ -627,7 +629,7 @@ and the mounted directories:
         # showmount --all
         All mount points on nfsshop:
         client9.exworks:/home
-                            
+
 
 ###   NFS client: software and configuration
 
@@ -649,7 +651,7 @@ The `mount` command normally used NFSmount mount to mount a remote
 filesystem through NFS:
 
         mount -t nfs remote:/there  /here
-                    
+
 
 -   This specifies the filesystem /there on the remote server remote.
 
@@ -659,12 +661,12 @@ Example: to mount the `/usr` filesystem, which is on server system
 `nfsshop`, onto the local mount-point `/usr`, use:
 
         mount -t nfs nfsshop:/usr /usr
-                    
+
 
 Fine-tuning of the mount request is done through *options*.
 
         mount -t nfs -o opts remote:/there /here
-                    
+
 
 -   Several options are possible after the `-o` option selector. These
     options affect either mount attempts or active NFS connections.
@@ -711,7 +713,7 @@ Fine-tuning of the mount request is done through *options*.
     versions](#NFSversions).
 
 `nfsvers=n`
- 
+
 -   Specifies the NFS version used for the transport (see [NFS protocol
     versions](#NFSversions)). Modern versions of `mount` will use
     version `3` by default. Older implementations that NFSnfsvers= still
@@ -771,7 +773,7 @@ Fine-tuning of the mount request is done through *options*.
 
     `fg`
 
-    :   All attempts occur in the foreground. 
+    :   All attempts occur in the foreground.
 
     *Background mounting* is also affected by other options. When `intr`
     is specified, the mount attempt will be interrupted by a an RPC
@@ -782,7 +784,7 @@ Fine-tuning of the mount request is done through *options*.
 Options can be combined using comma's:
 
         mount -t nfs -o ro,rsize=8192 nfsshop:/usr/share /usr/local/share
-                    
+
 
 A preferred combination of options might be: `hard`, `intr` and `bg`.
 The mount will be tried indefinitely, with retries in the background,
@@ -799,12 +801,12 @@ non-root users to perform the mount. This is not default. Example entry
 in `/etc/fstab`:
 
         nfsshop:/home /homesOnShop  nfs ro,noauto,user   0  0
-                    
+
 
 Now every user can do
 
         mount /homesOnShop
-                    
+
 
 You can also use automounters to mount and unmount remote automount
 filesystems. However, these are beyond the scope of this objective.
@@ -828,7 +830,7 @@ To see which file systems are mounted check /proc/mounts. It will also
 show nfs mounted filesystems.
 
         $ cat /proc/mounts
-                    
+
 
 ###   `rpcinfo`
 
@@ -848,7 +850,7 @@ is functioning:
 
         program vers proto   port
         100003    3   udp   2049  nfs
-                        
+
 
 This selection of the output shows that this portmapper will accept
 connections for nfs version 3 on udp.
@@ -872,7 +874,7 @@ A full sample output of `rpcinfo -p>` on a server system:
          100005    2   tcp  32768  mountd
          100005    3   udp  32771  mountd
          100005    3   tcp  32768  mountd
-                        
+
 
 As can be seen in the listing above, the portmapper will accept RPC
 requests for versions 2 and 3 of the NFS protocol, both on udp.
@@ -886,7 +888,7 @@ It is also possible to probe `nfsshop` (the server system) from a client
 system, by specifying the name of the server system after `-p`:
 
         rpcinfo -p nfsshop
-                        
+
 
 The output, if all is well of course, will be the same.
 
@@ -904,14 +906,14 @@ transport. The result of the test on `nfsshop`:
         rpcinfo -u nfsshop nfs
         program 100003 version 2 ready and waiting
         program 100003 version 3 ready and waiting
-                        
+
 
 The `-t` options will do the same for tcp transport:
 
         rpcinfo -t nfsshop nfs
         rpcinfo: RPC: Program not registered
         program 100003 is not available
-                        
+
 
 This system obviously does have support for nfs on udp, but not on tcp.
 
@@ -921,7 +923,7 @@ with the name `nfs`. Name or number can be used in each others place.
 That is, we could also have written:
 
         rpcinfo -u nfsshop 100003
-                            
+
 
 ###   The `nfsstat` command
 
@@ -943,28 +945,28 @@ all and also to make sure nothing has gone crazy.
 Sample output from `nfsstat -sn` on the server host `nfsshop`:
 
         Server nfs v2:
-        null       getattr    setattr    root       lookup     readlink   
-        1       0% 3       0% 0       0% 0       0% 41      0% 0       0% 
-        read       wrcache    write      create     remove     rename     
-        5595   99% 0       0% 0       0% 1       0% 0       0% 0       0% 
-        link       symlink    mkdir      rmdir      readdir    fsstat     
-        0       0% 0       0% 0       0% 0       0% 7       0% 2       0% 
+        null       getattr    setattr    root       lookup     readlink
+        1       0% 3       0% 0       0% 0       0% 41      0% 0       0%
+        read       wrcache    write      create     remove     rename
+        5595   99% 0       0% 0       0% 1       0% 0       0% 0       0%
+        link       symlink    mkdir      rmdir      readdir    fsstat
+        0       0% 0       0% 0       0% 0       0% 7       0% 2       0%
 
         Server nfs v3:
-        null       getattr    setattr    lookup     access     readlink   
-        1     100% 0       0% 0       0% 0       0% 0       0% 0       0% 
-        read       write      create     mkdir      symlink    mknod      
-        0       0% 0       0% 0       0% 0       0% 0       0% 0       0% 
+        null       getattr    setattr    lookup     access     readlink
+        1     100% 0       0% 0       0% 0       0% 0       0% 0       0%
+        read       write      create     mkdir      symlink    mknod
+        0       0% 0       0% 0       0% 0       0% 0       0% 0       0%
         remove     rmdir      rename     link       readdir    readdirplus
-        0       0% 0       0% 0       0% 0       0% 0       0% 0       0% 
-        fsstat     fsinfo     pathconf   commit     
-        0       0% 0       0% 0       0% 0       0% 
-                    
+        0       0% 0       0% 0       0% 0       0% 0       0% 0       0%
+        fsstat     fsinfo     pathconf   commit
+        0       0% 0       0% 0       0% 0       0%
 
-The `1`'s under both `null` headings are the result of the `rpcinfo -u 
+
+The `1`'s under both `null` headings are the result of the `rpcinfo -u
                 nfsshop nfs` command shown earlier.
 
-##  Securing NFS 
+##  Securing NFS
 
 NFS security has several unrelated issues. First, the NFS protocol and
 implementations have some known weaknesses. NFS file-handles are numbers
@@ -1032,7 +1034,7 @@ Also, name a mount point so that it can easily be recognized as a mount
 point. One of the possibilities is to use a special name:
 
         /MountPoints/nfsshop
-                        
+
 
 ###   Best NFS version
 
@@ -1042,7 +1044,7 @@ be prevented with better software.
 
 **Note**
 NFS version 4 is a new version of the NFS protocol intended to fix
-NFSversion 4 all existing problems in NFS. At the time of this writing
+NFSversion 3 all existing problems in NFS. At the time of this writing
 (May 2014) versions 4.0 and 4.1 have been released; version 4.2 is being
 developed. More about NFS version 4 and differences between earlier
 versions is covered in [NFS protocol versions](#NFSversions).
@@ -1061,7 +1063,7 @@ Version 4 of the NFS protocol defines encrypted connections. When the
 connection is encrypted, getting information by sniffing is made much
 harder or even impossible.
 
-Overview of NFS components 
+Overview of NFS components
 
 [table\_title](#NFSsoft) provides an overview of the most important
 files and software related to NFS.
@@ -1084,20 +1086,21 @@ files and software related to NFS.
 | `umount -t nfs -a`    |                      unmounts all remote filesystems|
 
 
-###   NFS protocol versions 
+###   NFS protocol versions
 
 Currently, there are a lot of changes in the NFS protocol that can
-affect the way the system is set up. 
-  
+affect the way the system is set up.
+
 |Protocol version |  Current status|      kernel or user space |  udp or tcp transport                                                                |
 |----|----|----|----|
-|  1  |    never released   ||                                                                                                              
-|  2   |               becoming obsolete   |user, kernel |          udp, some tcp impl. exist         |                                                  
-|  3 |                 new standard |       kernel  |              udp, tcp: under development                         |                                
-|  4 |                 new standard |       kernel    |             tcp                           performance improvements;   mandates strong security;   stateful protocol|
+|  1  |    never released   ||
+|  2   |               becoming obsolete   |user, kernel |          udp, some tcp impl. exist         |
+|  3 |                 new standard |       kernel  |              udp, tcp: under development                         |
+|  4 |                 new standard |       kernel    |             tcp                           performance improvements;   mandates strong security;   stateful protocol; multi-threaded transfers|
 
-The trends that can be seen in this table 
+The trends that can be seen in this table
 are: kernel space instead of user space and tcp instead of udp.
+
 
 **A note on the transport protocol.**
 
@@ -1107,7 +1110,7 @@ on a small, fast network. But `tcp` allows considerably larger packet
 sizes (`rsize`, `wsize`) to be set. With sizes of 64k, `tcp` connections
 are reported to be 10% faster than connections over `udp`, which does
 not allow sizes that large. Also, `tcp` is a more reliable protocol by
-design, compared to `udp`. 
+design, compared to `udp`.
 
 ###   NFSv4
 
@@ -1117,9 +1120,100 @@ single pseudo file system for each client. The origin for this pseudo
 file system may be from different filesystems, but this remains
 transparent to the client.
 
-NFSv4 offers an extended set of attributes, including support form MS
-Windows ACL's. Although NFSv4 offers enhanced security features
-compared to previous versions of NFS, and has been around since 2003, it
-was never widely adopted. Users are encouraged to implement NFSv4.1
-which has been ratified in January 2010. 
+###  Example: Setup NFSv4 only Server
 
+As per [man exports](https://linux.die.net/man/5/exports) the implications of using NFSv4 `fsid=0` or `fsid=root` is that you will need to export an explicit root of your pseudofilesystem, like this NFSv4 `/etc/exports` snippet:
+
+```bash
+        /srv/exports          10.0.1.0/24(rw,sync,crossmnt,fsid=0,no_subtree_check) 54.86.121.38/24(rw)  35.171.162.37(rw)
+        /srv/exports/backup   10-0-1-[53,122].local.domain(rw,sync,no_root_squash)  54.86.121.38/24(rw)  35.171.162.37(rw)
+        /srv/exports/tmp      10.0.1.0/24(rw,sync,all_squash,anonuid=99,anongid=99,no_subtree_check) 54.86.121.38/2(rw) 35.171.162.37(rw)
+```
+
+The first export line provides the pseudofilesystems root and is preventing clients to get access to data outside of this directory and allowing the NFS server to easily check if a client should be granted access to a file. Complexity is reduced while at the same time improving security.
+
+The mount points defind in `/etc/exports` needs to bee created on the host.
+
+```bash
+        mkdir -p /srv/exports/{tmp,backup}
+```
+
+Modify configuration files to disable NFSv2 and NFSv3 as documented for the distribution:
+
+```bash
+        NEED_STATD="no"
+        NEED_IDMAPD="no" # `rpc.idmapd`
+------------------------------------
+        MOUNTD_NFS_V2="no"
+        MOUNTD_NFS_V3="no"
+        RPCNFSDARGS="-N 2 -N 3"
+        RPCNFSDCOUNT=64
+```
+  **Note**
+
+`rpc.idmapd` isn't required unless you're doing ID mapping. Typically this is only going to occur if the server is joined to some sort of domain.
+`rpc.mountd` isn't required unless the server should support lower NFS versions
+
+* To be honest currently in a Debian 8 system the `rcp.mountd` is compiled with the nfs-kernel-system package. There is no possibility to disable it, without breaking the nfs-server.
+
+
+Start Sevices:
+
+         systemctl nfs-server start
+         systemctl nfs-idmapd start # optional
+
+
+`showmount -e`
+```bash
+        Export list for ip-10-0-1-53:
+        /srv/exports/tmp    (everyone)
+        /srv/exports/backup 10-0-1-[53,122].local.domain,54.86.121.38/24,35.171.162.37
+        /srv/exports        54.86.121.38/24,10.0.1.0/24,35.171.162.37
+```
+
+Add Iptables Rule to allow client to connect to port 2049:
+
+```bash
+        sudo iptables -A INPUT -s 10.0.1.122 -p tcp --dport 2049 -j ACCEPT
+
+```
+
+ **NFSv4client**
+
+
+modify fstab:
+
+        10.0.1.53:/  /mnt/exports  nfs4  sec=sys,noatime  0  0
+
+start nfs service:
+
+```bash
+        service nfs start
+```
+
+Print network connections:
+
+```bash
+netstat -tnp
+```
+
+        Active Internet connections (w/o servers)
+        Proto Recv-Q Send-Q Local Address               Foreign Address             State       PID/Program name
+        tcp        0      0 10.0.1.122:681              10.0.1.53:2049              ESTABLISHED -
+        tcp        0    232 10.0.1.122:22               54.155.86.211:50659         ESTABLISHED 1586/sshd
+
+
+  **NFSv4 Ports**
+
+NFSv4 does not need to interact with rpcbind, lockd, and rpc-statd services. The mounting and locking protocols have been incorporated into the NFSv4 protocol. The nfs-mountd service is still required on the NFS server to set up the exports but is not involved in any over-the-wire operations. For NFSv4, we only use port 2049 for nfsd service.
+
+  **NFSv4 Delegation**
+
+NFS version 4 allows servers to delegate control of files to clients so that, in certain situations, clients may perform operations on files with minimal interaction with the server. NFSv4.1 extends this ability to other kinds of objects, particularly directories.
+
+NFS version 4 offers an extended set of attributes, including support form MS
+Windows ACL's. Although NFSv4 offers enhanced security features
+compared to previous versions of NFS, and has been around since 2003, it was never widely adopted.
+Even thought NFS version 3 is a familiar and well understood protocol, but with the demands being placed on storage by exponentially increasing data and compute growth, NFS version 3 has become increasingly difficult to deploy and manage. For use in new projects NFS version 4.2 should be evaluated and Users are encouraged to implement NFS version 4.2 which has been ratified in January 2010.
+
+[RFC](https://www.rfc-editor.org/search/rfc_search_detail.php?sortkey=Date&sorting=DESC&page=25&title=NFSv4&pubstatus[]=Any&pub_date_type=any)
