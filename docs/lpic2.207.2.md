@@ -70,7 +70,7 @@ example `named.conf` shown earlier in this chapter.
         ;
         @   IN  NS      localhost.
         @   IN  A       127.0.0.1
-                    
+
 
 The `@` contains the name of the zone. It is called bind@ the *current
 origin*. A `zone` statement in `named.conf` defines that *current
@@ -80,7 +80,7 @@ origin*, as is seen in this part of the named.conf file we saw earlier:
                 type master;
                 file "/etc/bind/db.local";
         };
-                    
+
 
 So in this case the zone is called `localhost` and all current origins
 in the zone file will become bindlocalhost `localhost`.
@@ -107,7 +107,7 @@ file `/etc/bind/db.127`:
         ;
         @       IN  NS      localhost.
         1.0.0   IN  PTR     localhost.
-                    
+
 
 This is the calling part from `named.conf`:
 
@@ -115,7 +115,7 @@ This is the calling part from `named.conf`:
                 type master;
                 file "/etc/bind/db.127";
         };
-                    
+
 
 As can be seen, the *current origin* will be `127.in-addr.arpa`, so all
 `@`'s in the reverse zone file will be replaced by `127.in-addr.arpa`.
@@ -147,7 +147,7 @@ called `/etc/bind/db.root`
             type hint;
             file "/etc/bind/db.root";
         };
-                    
+
 
 By the way, note the type: `hint`! It is a special type for the root
 zone. Nothing else is stored in this file, and it is not updated
@@ -163,8 +163,8 @@ Here is a part from the `db.root` file.
         ; formerly NS1.ISI.EDU
         ;
         .                        3600000      NS    B.ROOT-SERVERS.NET.
-        B.ROOT-SERVERS.NET.      3600000      A     128.9.0.107          
-                    
+        B.ROOT-SERVERS.NET.      3600000      A     128.9.0.107
+
 
 Note the dot at the left, this is the root zone!
 
@@ -173,14 +173,14 @@ current. You can look at `ftp.rs.internic.net` for a new version. Or,
 you could run something like
 
         dig @a.root-servers.net . ns > roothints
-                    
+
 
 This will create a new file.
 
 You can also run
 
         dig @a.root-servers.net . SOA
-                    
+
 
 You can do this periodically to see if the SOA version number (see
 below) has changed.
@@ -206,7 +206,7 @@ like
             type master;
             file "/etc/bind/exampleorg.zone";
         };
-                    
+
 
 This is an example zone file for the zone `example.org`.
 
@@ -232,7 +232,7 @@ This is an example zone file for the zone `example.org`.
 
         ; our laptop
         bird   IN   A       224.123.240.4
-                    
+
 
 Let's examine this file in detail.
 
@@ -243,12 +243,12 @@ server requests information about this zone, it also gets the TTL. After
 the TTL is expired, it should renew the data in the cache.
 
         $TTL 3h
-                        
+
 
 This sets the default TTL to 3 hours, and
 
         $TTL 86400
-                        
+
 
 this one to 86400 seconds (same as `1d` (1 day)).
 
@@ -281,7 +281,7 @@ Earlier we saw the following `SOA` record:
                      3600    ; Retry
                    604800    ; Expiration
                      3600 )  ; Negative caching
-                        
+
 
 Elements of these `SOA` lines are
 
@@ -326,7 +326,7 @@ dnsmaster.lion.example.org.
         a serial number of
 
                 2001110701
-                                                            
+
 
         corresponds to the second (!) change on the 7th of November in
         the year 2001. The next day, the first change will get the
@@ -370,7 +370,7 @@ The `A` record is the *address* record. It connects an IP address to a
 hostname. An example record is
 
         lion   IN   A       224.123.240.1
-                        
+
 
 This connects the name `lion.example.org` (remember that the current
 origin `example.org` is added to any name that does not end in a dot) to
@@ -394,7 +394,7 @@ example of a combined `A` and `CNAME` record is
 
         cat   IN  A     224.123.240.3
         www   IN  CNAME cat.example.org.
-                        
+
 
 This makes `www.example.org` point to `cat.example.org`.
 
@@ -406,7 +406,7 @@ Specifies a name server for the zone. For example
 
              IN  NS    lion.example.org.
              IN  NS    cat.example.org.
-                        
+
 
 The first thing that catches the eye is that there is nothing before the
 IN tag in the NS lines. In this case, the current origin that was
@@ -434,7 +434,7 @@ Example entries:
         lion   IN   A       224.123.240.1
                IN  MX   0   lion.example.org.
                IN  MX  10   cat.example.org.
-                        
+
 
 So this example specifies that mail for `lion.example.org` is first sent
 to `lion.example.org`. If that host is down, `cat.example.org` is used
@@ -459,7 +459,7 @@ To implement this, place MX records for `example.org` in the
         ; accept mail for the domain too
         example.org.  IN  MX   0   lion.example.org.
         example.org.  IN  MX  10   cat.example.org.
-                        
+
 
 Mail addressed to `example.org` will only be accepted by the MTA on
 `lion.example.org` host if the MTA is configured for this.
@@ -479,7 +479,7 @@ corresponding *reverse zone* is called `240.123.224.in-addr.arpa`. In
             type master;
             file "/etc/bind/exampleorg.rev";
         };
-                    
+
 
 An example `/etc/bind/exampleorg.rev` (corresponding to the
 `example.org` domain we saw earlier) is:
@@ -498,13 +498,13 @@ An example `/etc/bind/exampleorg.rev` (corresponding to the
         2      IN   PTR     doggy.example.org.
         3      IN   PTR     cat.example.org.
         4      IN   PTR     bird.example.org.
-                    
+
 
 The current origin is `240.123.224.in-addr.arpa`, so the entry for bird
 actually is
 
         4.240.123.224.in-addr.arpa IN PTR bird.example.org.
-                    
+
 
 ####  The `PTR` record
 
@@ -537,7 +537,7 @@ IPv6. It resolves a hostname to an IPv6 address in the same way as an
 `A` record does for IPv4.
 
         lion   IN   AAAA    2001:db8::ff00:42:8329
-                        
+
 
 **Note**
 Note: Another format used to resolve IPv6 address records was the A6
@@ -562,7 +562,7 @@ Part of that domain may be delegated, just as IPv4 addresses. In
             type master;
             file "/etc/bind/exampleorg-ip6.rev";
         };
-                        
+
 
 The corresponding file should look like the following file:
 
@@ -577,7 +577,7 @@ The corresponding file should look like the following file:
                IN  NS       cat.example.org.
 
         9.2.3.8.2.4.0.0.0.0.f.f.0.0.0.0      IN   PTR     lion.example.org.
-                        
+
 
 As both IPv4 and IPv6 PTR records are in different zones (i.e.
 `in-addr.arpa` and `ip6.arpa`) they should be defined in separate zone
@@ -616,7 +616,7 @@ This implies that the configuration must handle
 A zone definition is defined as *master* by using the
 
         type master;
-                    
+
 
 statement inside a zone definition. See, for example, this zone
 statement (in `named.conf`) that defines the `example.org` master.
@@ -625,7 +625,7 @@ statement (in `named.conf`) that defines the `example.org` master.
         type master;
         file "/etc/bind/exampleorg.zone";
         };
-                    
+
 
 Of course, the `exampleorg.zone` file must be created as discussed
 earlier.
@@ -656,7 +656,7 @@ Older versions of BIND used the term *primary* instead of *master*.
 A zone definition is defined as *slave* by using the
 
         type slave;
-                    
+
 
 statement inside a zone definition, accompanied by the IP address(es) of
 the master(s). Here, for example, is the zone statement (in
@@ -667,7 +667,7 @@ the master(s). Here, for example, is the zone statement (in
             masters { 224.123.240.1; }; // lion
             file "db.example.org";
         };
-                    
+
 
 The file `db.example.org` is created by the slave name server itself.
 The slave has no data for `example.org`. Instead, a slave receives its
@@ -744,7 +744,7 @@ Let's look at an example file of the `scripts.example.org` zone:
              IN MX  10 ctl
              IN MX  20 lion.example.org.
         sh   IN CNAME bash
-                    
+
 
 Nothing new, just a complete zone file.
 
@@ -756,7 +756,7 @@ zone. This is the way to delegate in the `example.org` zone file:
                  2d IN NS bash.scripts.example.org.
         ctl.scripts.example.org.  2d IN  A 224.123.240.16
         bash.scripts.example.org. 2d IN  A 224.123.240.18
-                    
+
 
 That's all!
 
@@ -778,7 +778,7 @@ for an example.
         # named-checkzone test.com /var/named/test.com.zone
         zone test.com/IN: loaded serial 0
         OK
-                    
+
 
 In this example I didn't put a dot at the end of the domain name but
 you can choose to do so. Both ways are correct and will give the same
@@ -804,7 +804,7 @@ named.conf files on the secondary name servers that you administer.
 Example below shows the correct syntax for this.
 
         masterfile-format text;
-                    
+
 
 DNS Utilities
 
@@ -818,7 +818,7 @@ The `dig` command lets you resolve names in a way that is close to the
 setup of a zone file. For instance, you can do
 
         dig bird.example.org A
-                    
+
 
 This will do a lookup of the `A` record of `bird.example.org`. Part of
 the output looks like this:
@@ -831,7 +831,7 @@ the output looks like this:
 
         ;; ADDITIONAL SECTION:
         lion.example.org.  1D IN A 224.123.240.1
-                    
+
 
 If `dig` shows a `SOA` record instead of the requested `A` record, then
 the domain is ok, but the requested host does not exist.
@@ -840,7 +840,7 @@ It is even possible to query another name server instead of the one(s)
 specified in `/etc/resolv.conf`:
 
         dig @cat.example.org bird.example.org A
-                    
+
 
 This will query name server `cat.example.org` for the `A` record of host
 `bird`. The name server that was contacted for the query will be listed
@@ -850,7 +850,7 @@ The `dig` command can be used to test or debug your reverse zone
 definitions. For instance,
 
         dig 4.240.123.224.in-addr.arpa PTR
-                    
+
 
 will test the reverse entry for the `lion` host. You should expect
 something like this:
@@ -863,25 +863,25 @@ something like this:
 
         ;; ADDITIONAL SECTION:
         lion.example.org.      1D IN A       224.123.240.4
-                    
+
 
 If you get something like
 
         ;; ANSWER SECTION:
         4.240.123.224.in-addr.arpa. 1D IN PTR lion.example.org.240.123.224.in-addr.arpa.
-                    
+
 
 you've made an *error* in your zone file. Given a *current origin* of
 `240.123.224.in-addr.arpa.`, consider the line:
 
         4  IN PTR lion.example.org ; WRONG!
-                    
+
 
 The dot at the end was omitted, so the current origin is appended
 automatically. To correct this, add the trailing dot:
 
         4  IN PTR lion.example.org. ; RIGHT!
-                    
+
 
 **Note**
 When specifying a hostname like `bird.example.org` or
@@ -897,34 +897,34 @@ When a hostname is specified as a parameter, the corresponding `A`
 record will be shown. For example:
 
         host bird.example.org
-                    
+
 
 will result in output like
 
         bird.example.org    A    224.123.240.4
-                    
+
 
 The `host` program is especially useful when a hostname is wanted and an
 IP address is given. For example:
 
         host 224.123.240.4
-                    
+
 
 from our example hosts shows output like:
 
         Name: bird.example.org
         Address: 224.123.240.4
-                    
+
 
 The following command is also possible:
 
         host 4.240.123.224.in-addr.arpa
-                    
+
 
 resolves the PTR record:
 
         4.240.123.224.in-addr.arpa PTR bird.example.org
-                    
+
 
 **Note**
 As is the case with `dig`, when specifying a hostname like
@@ -942,7 +942,7 @@ For instance, start the interactive mode by entering `nslookup` and
 typing:
 
         ls -d example.org.
-                    
+
 
 In result, the output will be shown in a zonefile-like format (beginning
 shown):
@@ -958,7 +958,7 @@ shown):
 
                             1D IN NS   lion
                             1D IN MX 0 lion
-                    
+
 
 The first line, in square brackets, contains the name of the name server
 that sent the answer.
@@ -997,4 +997,4 @@ accuracy. Example:
         WARN: www.zoneedit.com A 64.85.73.107: no PTR record
         WARN: newapi.zoneedit.com A 64.85.73.104: no PTR record
         0 failures, 15 warnings, 0 errors.
-                    
+

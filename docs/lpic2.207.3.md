@@ -72,7 +72,7 @@ requestors IP address in your firewalls.
 The command
 
         dig @target chaos version.bind txt
-                    
+
 
 will show the version of the BIND nameserver on host *target*.
 
@@ -85,8 +85,8 @@ version will be set to the string `hidden`.
 
             // hide bind version
             version "hidden";
-        };        
-                    
+        };
+
 
 The CERT article ([???](#nijssen99)) shows a way to limit access to the
 `bind` zone. This an alternative to replacing the BIND version.
@@ -101,7 +101,7 @@ statement.
             localhost;
             192.168.1.0/24;
         };
-                    
+
 
 This `acl` defines an *access control list* with label `trusted`. ACL
 labels are used to simplify administration: you only need to update your
@@ -199,7 +199,7 @@ example using the `dig` command:
         ;; SERVER: 209.62.64.46#53(209.62.64.46)
         ;; WHEN: Fri Jun 28 12:01:16 2013
         ;; XFR size: 37 records (messages 37, bytes 2673)
-                        
+
 
 The previous example shows the complete information about
 `zonetransfer.me`. The command `host -l` does the same but formats its
@@ -209,7 +209,7 @@ output differently:
         Using domain server:
         Name: ns16.zoneedit.com
         Address: 69.64.68.41#53
-        Aliases: 
+        Aliases:
 
         zonetransfer.me nameserver ns16.zoneedit.com.
         zonetransfer.me nameserver ns12.zoneedit.com.
@@ -225,7 +225,7 @@ output differently:
         deadbeef.zonetransfer.me has IPv6 address dead:beaf::
         vpn.zonetransfer.me has address 174.36.59.154
         dc_office.zonetransfer.me has address 143.228.181.132
-                        
+
 
 Only validated slave nameservers should be allowed to issue a *zone
 transfer* request. This can be done by making adjustments to the
@@ -251,7 +251,7 @@ to limit zone transfers to a list of known slave servers.
                 my_slave_servers;
             };
         };
-                            
+
 
 Now only the slaves (only the host `cat` in the example) can request a
 *zone transfer* from this master nameserver.
@@ -269,7 +269,7 @@ can be achieved by setting the `allow-transfer` clause to 'none':
                 none;
             };
         };
-                            
+
 
 **Note**
 *IMPORTANT:*Don't forget to protect the *reverse zone* as well!
@@ -294,7 +294,7 @@ follows:
                 myhosts;
             };
         };
-                        
+
 
 This limits queries to hosts with an IP address that starts with
 `224.123.240`.
@@ -335,12 +335,12 @@ nameserver under this user/group combination.
 Use the `-u` and `-g` options to run `named` as `named`/`named`:
 
         named -u named -g named
-                    
+
 
 On a Debian system the start line in `/etc/init.d/bind` would be:
 
         start-stop-daemon ... --exec /usr/sbin/named -- -u named -g named
-                    
+
 
 (For clarity other options were replaced by dots). The extra `--` tells
 the `start-stop-daemon` where its options end, all other options will be
@@ -356,7 +356,7 @@ there. To start the service on Red Hat (compatible) systems, use the
         # service named start
         Generating /etc/rndc.key:                                  [  OK  ]
         Starting named:                                            [  OK  ]
-                    
+
 
 To make `named` start up in the proper runlevels on Red Hat (compatible)
 systems run `chkconfig named on`.
@@ -387,13 +387,13 @@ In short:
     next command will create it:
 
             mknod -m 666 /var/cache/bind/dev/null c 1 3
-                                        
+
 
 -   You will need a `passwd` and a `group` file in the new `/etc`:
 
             cd /var/cache/bind/etc
             cp -p /etc/{passwd,group} .
-                                        
+
 
     This copies the literal passwd and group files. An alternative is to
     create special `passwd` and `group` files, as will be shown in
@@ -404,7 +404,7 @@ In short:
             cd /var/cache/bind/etc
             cp /etc/ld.so.cache .
             cp /etc/localtime .
-                                        
+
 
 -   The BIND configuration should also be placed under the new root, as
     `named` might need it when you reload the server. Given that your
@@ -421,13 +421,13 @@ In short:
     For instance, suppose the command:
 
             ldd /usr/sbin/named
-                                        
+
 
     yields
 
             libc.so.6 => /lib/libc.so.6 (0x40015000)
             /lib/ld-linux.so.2 => /lib/ld-linux.so.2 (0x40000000)
-                                        
+
 
     In the (real) `/lib` directory, `libc.so.6` is a symlink to
     `libc-2.1.3.so` and `ld-linux.so.2` is a symlink to `ld-2.1.3.so`.
@@ -436,14 +436,14 @@ In short:
 
             cd /var/cache/bind/lib
             cp -pd /lib/{libc.so.6,libc-2.1.3.so,ld-linux.so.2,ld-2.1.3.so} .
-                                        
+
 
 -   Both the `named` and the `named-xfer` programs must be present under
     the new root. The `rndc` program might be useful too. For example:
 
             cp -p /usr/sbin/named{,-xfer} /var/cache/bind/usr/sbin
             cp -p /usr/sbin/rndc /var/cache/bind/usr/sbin
-                                        
+
 
 #### Running BIND chrooted
 
@@ -459,12 +459,12 @@ In some systems you may need to add the option to the startup file. For
 example:
 
         start-stop-daemon ... --exec /usr/sbin/named -- -t /var/cache/bind
-                        
+
 
 or
 
         daemon ... /sbin/named -t /var/cache/bind
-                        
+
 
 The BIND nameserver switches to the chroot immediately after command
 line argument parsing, so before configuration files are read. All paths
@@ -483,7 +483,7 @@ alternative logfile inside the chrooted environment. See this fragment
 of a `named.conf` file you could use:
 
         logging {
-            channel some_log { 
+            channel some_log {
                 file "bind.log" versions 3;
                 severity info;
             };
@@ -492,7 +492,7 @@ of a `named.conf` file you could use:
 
             // ...
         };
-                        
+
 
 This will write logging information to the file
 `/var/cache/bind/var/cache/bind/bind.log`.
@@ -505,7 +505,7 @@ like this:
             type master;
             file "/etc/bind/example.com.zone";
         };
-                        
+
 
 Then the `example.com.zone` file needs to be located in
 `/var/cache/bind/etc/bind`, again assuming your chroot directory is
@@ -659,7 +659,7 @@ a *nametype* (`-n` option)
 As an example, say we typed this command:
 
         $ dnssec-keygen -a DSA -b 768 -n ZONE example.com.
-                    
+
 
 After completion there will be two files, which have names similar to
 `Kexample.com.+003+58649.key` and `Kexample.com.+003+58649.private`.
@@ -670,11 +670,11 @@ contents similar to this:
         Private-key-format: v1.2
         Algorithm: 3 (DSA)
         Prime(p): ww4 ..
-        Subprime(q): qHwn .. 
-        Base(g): ncWqWFJ ... 
+        Subprime(q): qHwn ..
+        Base(g): ncWqWFJ ...
         Private_value(x): YuO ...
         Public_value(y): JKvGZ ...
-                    
+
 
 Note that lines that have been truncated for better readability end in
 an ellipsis.
@@ -683,7 +683,7 @@ The contents of `Kkey.example.com.+003+58649.key` will be similar to
 this:
 
         example.com. IN DNSKEY 256 3 3 BKh8J+a ...
-                    
+
 
 Please note that generation of a HMAC-MD5 generates two files too, but
 both will contain the exact same 'key':
@@ -701,7 +701,7 @@ both will contain the exact same 'key':
         Private-key-format: v1.2
         Algorithm: 157 (HMAC_MD5)
         Key: HUcmGO7VZ ...
-                    
+
 
 ####  Using the key
 
@@ -712,7 +712,7 @@ copy and paste the key you generated in that section:
             algorithm "hmac-md5";
             secret "5HUcmGO7VZ ...";
         };
-                    
+
 
 The key can be read (and possibly misused) by anybody who has access
 rights to the `named.conf` file. Make sure it can not be read by anybody
@@ -730,7 +730,7 @@ address `224.123.400.1` we may use:
         server 224.123.400.1 {
             keys key.example.com.;
         };
-                    
+
 
 On the other server (`224.123.400.1`) we need to do the same for server
 `224.123.400.2`: add the `key` statement and copy in the key and allow
@@ -745,7 +745,7 @@ proper keys installed, use:
             file "example.com.zone";
             allow-transfer { key key.example.com.; };
         };
-                    
+
 
 See the `named.conf(5)` manual page for additional use cases.
 
@@ -776,11 +776,11 @@ again.
 An Example of an NSEC record for the dnssec-tools.org domain:
 
         adonis.zonetransfer.me.       10800   IN      NSEC   helena.zonetransfer.me.
-                        
+
 
 The record specifies that no DNS records exist between
 `adonis.zonetransfer.me.` and `helena.zonetransfer.me.
-                `, which would exclude `brutus.zonetransfer.me. 
+                `, which would exclude `brutus.zonetransfer.me.
             ` from being an existing and therefore valid domain.
 
 Use of NSEC records solves one problem, but introduces the next: it
@@ -881,7 +881,7 @@ Certificate taken from RFC 6698 looks as follows:
         _443._tcp.www.example.com. IN TLSA (
               0 0 1 d2abde240d7cd3ee6b4b28c54df034b9
                     7983a1d16e8a410e4561cb106618e971 )
-                
+
 
 Each TLSA Resource Record (RR) specifies the following fields in order
 to create the *certificate association*: *Certificate Usage*,
@@ -1005,7 +1005,7 @@ doing this by putting bindheartbeat-interval
         // prevent dialup access
         heartbeat-interval 0;
         dialup yes; // Actually disables dialup!
-                    
+
 
 inside the `options` statement of the `named.conf` file. It is a bit
 counterintuitive to have to put `dialup yes` in a configuration actually
@@ -1030,7 +1030,7 @@ on another host that can be used to resolve names from both the outside
 world and the internal zones.
 
 The figure below presents the `exworks` domain that is used as an
-example. 
+example.
 
 ![](images/207-exwrks.dot.svg.jpg)
 
@@ -1075,7 +1075,7 @@ First, prepare a master file for the internal root zone. For example:
         ; glue records
         exworks.                 IN NS privdns.exworks.
         72.168.192.in-addr.arpa. IN NS privdns.exworks.
-                        
+
 
 Note the glue records that delegate the `exworks` and
 `72.168.192.in-addr.arpa` zones as being hosted on nameserver
@@ -1091,7 +1091,7 @@ file for the root zone:
             allow-transfer { none; };
             allow-query    { none; };
         };
-                        
+
 
 Using the type `master` tells the DNS that this really is a master
 server for the root zone. The root zone should not be known to any other
@@ -1113,7 +1113,7 @@ file. The entry for `exworks` should look like this:
             allow-transfer { none; };
             allow-query    { 192.168.72.1; }; // liongate
         };
-                        
+
 
 The nameserver on `liongate` is the one providing names to the other
 hosts, so the IP address of `liongate` must be listed in the
@@ -1125,7 +1125,7 @@ Make sure the `options` statement contains
 
         recursion no;
         fetch-glue no;
-                        
+
 
 These statements tell the nameserver it should not accept queries for
 zones other than the ones it knows about.
@@ -1134,13 +1134,13 @@ Hosts in the `exworks` zone should point their `resolv.conf` to
 `liongate`. bind resolv.conf That is, the file should contain the line:
 
         nameserver 192.168.72.1
-                        
+
 
 where `192.168.72.1` is the IP address of `liongate`. On `liongate`
 itself, however,
 
         nameserver 127.0.0.1
-                        
+
 
 ensures that local queries are run over the local loop interface, which
 is more efficient than using the outside IP address.
@@ -1165,7 +1165,7 @@ this nameserver are being forwarded to one on the listed IP addresses
             192.168.72.2;   // privdns
             224.121.121.99; // ISP's DNS
         };
-                        
+
 
 The nameservers are tried in the order in which they are listed.
 Requests are forwarded to `privdns` first. If that one does not have the
@@ -1188,7 +1188,7 @@ The first alternative is to use *two* `nameserver` statements in
 
         nameserver 192.168.72.2
         nameserver 192.168.72.1
-                            
+
 
 The first IP address points to `privdns`, the second to `liongate`. In
 this situation, `privdns` should also accept queries from
@@ -1294,7 +1294,7 @@ Here are the three master zone definitions:
             allow-transfer { 127.0.0.1; };
             allow-query    { 127.0.0.1; };
         };
-                        
+
 
 The `directory` refers to a location inside the chrooted tree. The
 `listen-on` specifies that this nameserver should only listen on port
@@ -1361,7 +1361,7 @@ looks like this:
             allow-transfer { none; };
             allow-query    { 127.0.0.1; 192.168.72.0/24; };
         };
-                        
+
 
 This implements:
 
@@ -1387,13 +1387,13 @@ well as all hosts in the `exworks` zone (`192.168.72.`*x*).
 On `liongate` the `resolv.conf` file will contain
 
         nameserver 127.0.0.1
-                        
+
 
 that is, it points to the *visible* nameserver which listens on port
 `53`. Other hosts in the `exworks` domain will have
 
         nameserver 192.168.72.1
-                        
+
 
 (the IP address of `liongate`) in their `resolv.conf`.
 
@@ -1437,7 +1437,7 @@ familiar `dnssec-keygen` command:
 
         # dnssec-keygen -a HMAC-MD5 -b 512 -n HOST rndc-key
         Krndc-key.+157+24876
-                    
+
 
 The utility will generate two output files. Note that the keys in both
 files will always be duplicates as we required a HMAC-MD5.
@@ -1445,11 +1445,11 @@ files will always be duplicates as we required a HMAC-MD5.
         # ls -l Krndc-key.+157+24876*
         -rw------- 1 root bind 117 Jul  5 05:28 Krndc-key.+157+24876.key
         -rw------- 1 root bind 229 Jul  5 05:28 Krndc-key.+157+24876.private
-                    
+
 
 The contents of the private keyfile might be similar to this:
 
-        # cat Krndc-key.+157+24876.private 
+        # cat Krndc-key.+157+24876.private
         Private-key-format: v1.3
         Algorithm: 157 (HMAC_MD5)
         Key: XIQDYlGaIbWfyopYHS1vtFrlfJiiIkiEbiNj4kN8Ke+F0hEqA7KVwcJMR/6URez32XBEmKZf2W1GUzjpbI2KJQ==
@@ -1457,7 +1457,7 @@ The contents of the private keyfile might be similar to this:
         Created: 20130705102726
         Publish: 20130705102726
         Activate: 20130705102726
-                    
+
 
 Create a file to hold the secret you just generated and the IP addresses
 of slave nameservers. The name of the file can be freely chosen, in this
@@ -1472,13 +1472,13 @@ from this example:
         # nameserver 2 (slave)
         server 10.0.1.2 {
             keys { TRANSFER; };
-        };  
+        };
 
         # nameserver 3 (slave)
         server 10.0.1.3 {
             keys { TRANSFER; };
         };
-                    
+
 
 Note: the server option points to the slave nameserver.
 
@@ -1486,13 +1486,13 @@ Edit the BIND main configuration file `named.conf` and include the file
 like this:
 
         include "/etc/bind/tsig.key";
-                    
+
 
 Now, reload the BIND configuration:
 
         # rndc reload
         server reload successful
-                    
+
 
 Use `rndc tsig-list` to list the currently active TSIG keys. This
 completes the configuration on the master. Next we will need to
@@ -1511,7 +1511,7 @@ now make the `server` option point to the master nameserver:
         server 10.0.1.1 {
             keys { TRANSFER; };
         };
-                    
+
 
 As before, include the path to the `tsig.key` file to the BIND main
 configuration file and reload the configuration. TSIG is now enabled.

@@ -72,9 +72,9 @@ distributions.
 
 |  Component |  Description |
 |----|----|
-|`/usr/sbin/named`|          the real name server 
+|`/usr/sbin/named`|          the real name server
 | `/usr/sbin/rndc` |             name daemon control program |
-|`/usr/sbin/named-checkconf`  | program to check named.conf file for errors 
+|`/usr/sbin/named-checkconf`  | program to check named.conf file for errors
 `named.conf` |                    BIND configuration file |
 |/etc/init.d/bind` |           distribution specific start script |
 |`/var/named`|                working directory for `named` |
@@ -85,7 +85,7 @@ is mentioned in [???](#c2.210).
 
 BIND components will be discussed below.
 
-###   The `named.conf` 
+###   The `named.conf`
 
 The file `named.conf` is the main configuration file of BIND.
 bindnamed.conf It is the first configuration file read by `named`, the
@@ -156,7 +156,7 @@ below is taken from the Debian bind package (some comments removed).
         };
 
         // add entries for other zones below here
-                    
+
 
 The Debian bind package that contains this file, will provide a fully
 functional *caching-only* name server. BIND packages of other
@@ -241,7 +241,7 @@ There can be only *one* `options` statement in a `named.conf` file.
 
                 // ...
             };
-                                    
+
 
     In this example bind is told to query *only* the name servers
     `123.12.134.2` and `123.12.134.3`.
@@ -271,19 +271,19 @@ There can be only *one* `options` statement in a `named.conf` file.
             ;; SERVER: 209.62.64.46#53(209.62.64.46)
             ;; WHEN: Tue Jun 25 11:38:48 2013
             ;; MSG SIZE  rcvd: 60
-                                    
+
 
     Note that the BIND version is shown in the output. Because some BIND
     versions have known exploits, the BIND version is sometimes kept
     hidden. The `version` specification:
 
             version "not revealed";
-                                    
+
 
     or
 
             version none;
-                                    
+
 
     inside the `options` statement leads to `not revealed` responses on
     version queries.
@@ -301,7 +301,7 @@ There can be only *one* `options` statement in a `named.conf` file.
 
             heartbeat-interval 0;
             dialup yes; // NOTE: This actually *stops* dialups!
-                                    
+
 
 Many more options can be placed inside the options block. Refer to the
 manual pages for details.
@@ -313,7 +313,7 @@ file though, which can be accomplished by adding the following line to
 `named.conf`:
 
         include "/etc/bind/named.conf.options";
-                    
+
 
 Other separate configuration files like `named.conf.log` or
 `named.conf.default-zones` may be nested this way as well.
@@ -344,7 +344,7 @@ example, to the `default_syslog` channel, use the following:
             category security { default_syslog; };
             // ...
         };
-                    
+
 
 To turn off logging for certain types of data, send it to the `null`
 channel, as is done in the example `named.conf` shown earlier:
@@ -353,7 +353,7 @@ channel, as is done in the example `named.conf` shown earlier:
                 category lame-servers { null; };
                 category cname { null; };
         };
-                    
+
 
 This means that messages of types `lame-servers` and `cname` are being
 discarded.
@@ -375,7 +375,7 @@ origin*. For example,
                 type master;
                 file "/etc/bind/db.127";
         };
-                    
+
 
 will result in a *current origin* of `127.in-addr.arpa` that is
 available as "@" in file `/etc/bind/db.127`.
@@ -419,7 +419,7 @@ requires a `/etc/rndc.key` file which contains a key.
             default-server 127.0.0.1;
             default-port 953;
         };
-                
+
 
 The name server configuration file `/etc/named.conf` needs to contain
 the same key to allow a host to control the name server. The relevant
@@ -429,12 +429,12 @@ part of that file is shown below.
             algorithm hmac-md5;
             secret "tyZqsLtPHCNna5SFBLT0Eg==";
         };
-     
+
         controls {
             inet 127.0.0.1 port 953
                 allow { 127.0.0.1; } keys { "rndc-key"; };
         };
-                
+
 
 The secret itself will never be transmitted over the network. Both ends
 calculate a hash using the algorithm declared after the `algorithm`
@@ -465,7 +465,7 @@ file for errors. If the `named.conf` file is located in the regular
 the command to check the file.
 
         # named-checkconf
-                
+
 
 The location of the named.conf file can be different however (depending
 on the distribution you are using). In some cases for example the file
@@ -475,7 +475,7 @@ these cases you will have to include path and filename after the
 command.
 
         # named-checkconf /etc/bind/named.conf
-                
+
 
 When the prompt returns without giving any messages it means that
 `named-checkconf` didn't find anything wrong with it. The example below
@@ -485,7 +485,7 @@ statement.
 
         [root@localhost etc]# named-checkconf
         /etc/named.conf:56: unknown option 'nclude'
-                
+
 
 The `named-checkconf` utility will only check the `named.conf` file.
 Other configuration files called from within the `named.conf` file using
@@ -503,7 +503,7 @@ manpage. One example is the bindSIGHUP `SIGHUP` signal, that causes
 Signals are sent to named with the kill command, e.g.,
 
         kill -HUP 217
-                
+
 
 This sends a `SIGHUP` signal to a `named` process with process id `217`,
 which triggers a reload.
@@ -520,7 +520,7 @@ instead. `service` uses the same set of parameters, so you might, for
 example, say:
 
         # service named reload
-                    
+
 
 Table [table\_title](#etcInit.dBindArgs) lists parameters which a
 current version of `/etc/init.d/bind` accepts.
@@ -545,7 +545,7 @@ network boot protocols.
         dnsmasq - Small caching DNS proxy and DHCP/TFTP server
         dnsmasq-base - Small caching DNS proxy and DHCP/TFTP server
         dnsmasq-utils - Utilities for manipulating DHCP leases
-                
+
 ###   djbdns
 
 `djbdns` - Daniel J. Bernstein DNS - was build due to frustrations with
@@ -576,7 +576,7 @@ including a simple backend that accepts BIND style files.
         pdns-recursor - PowerDNS recursor
         pdns-recursor-dbg - debugging symbols for PowerDNS recursor
         pdnsd - Proxy DNS Server
-                    
+
 
 ##  The `dig` and `host` utilities
 
@@ -612,7 +612,7 @@ differences:
                -4 use IPv4 query transport only
                -6 use IPv6 query transport only
                -m set memory debugging flag (trace|record|usage)
-                
+
 
         $ dig -h
         Usage:  dig [@global-server] [domain] [q-type] [q-class] {q-opt}
@@ -683,7 +683,7 @@ differences:
                 local d-opts and servers (after host name) affect only that lookup.
                 -h                           (print help and exit)
                 -v                           (print version and exit)
-                
+
 
 As demonstrated, the `dig` command provides the broader range of
 options. Without options though, the provided information is quite
@@ -698,7 +698,7 @@ similar:
         zonetransfer.me mail is handled by 0 ASPMX.L.GOOGLE.COM.
         zonetransfer.me mail is handled by 10 ALT1.ASPMX.L.GOOGLE.COM.
         zonetransfer.me mail is handled by 10 ALT2.ASPMX.L.GOOGLE.COM.
-                
+
 
         $ dig zonetransfer.me
 
@@ -725,7 +725,7 @@ similar:
         ;; SERVER: 213.154.248.156#53(213.154.248.156)
         ;; WHEN: Thu Jun 27 07:30:36 2013
         ;; MSG SIZE  rcvd: 115
-                
+
 
 `$` `man dig`
 
@@ -736,7 +736,7 @@ similar:
                dig [@server] [-b address] [-c class] [-f filename] [-k filename] [-m] [-p port#]
                    [-q name] [-t type] [-x addr] [-y [hmac:]name:key] [-4] [-6] [name] [type]
                    [class] [queryopt...]
-                
+
 
 An important option is `-t` to query for example only the MX or NS
 records. This option works for `dig` and `host`. (Look at the man pages
@@ -760,7 +760,7 @@ of both commands for the explanation of the other options.)
         ;; SERVER: 8.8.8.8#53(8.8.8.8)
         ;; WHEN: Tue Oct 20 09:55:13 2015
         ;; MSG SIZE  rcvd: 41
-                
+
 
         $ dig -t NS sue.nl
 
@@ -782,7 +782,7 @@ of both commands for the explanation of the other options.)
         ;; SERVER: 8.8.8.8#53(8.8.8.8)
         ;; WHEN: Tue Oct 20 10:00:24 2015
         ;; MSG SIZE  rcvd: 108
-                
+
 
         $ dig -t MX sue.nl
 
@@ -803,4 +803,4 @@ of both commands for the explanation of the other options.)
         ;; SERVER: 8.8.8.8#53(8.8.8.8)
         ;; WHEN: Tue Oct 20 10:02:01 2015
         ;; MSG SIZE  rcvd: 64
-                
+
