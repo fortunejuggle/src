@@ -186,14 +186,14 @@ How to run Apache-SSL as a shareable (DSO) module: First of all, install
 the appropriate package:
 
         packagemanager installcommand modulename
-                    
+
 
 Depending on your distribution, the configuration file(s) might or might
 not have been adjusted accordingly. Always check for the existence of a
 `LoadModule` line in one of the configuration files:
 
         LoadModule apache_ssl_module modules/libssl.so
-                    
+
 
 This line might belong in the Apache main configuration file, or one of
 the included configuration files. A construction that has been receiving
@@ -212,7 +212,7 @@ directory somewhere else on the filesystem. An example from a Red Hat
 based host:
 
         Include conf.modules.d/*.conf
-                
+
 
 Again, the implementations you could encounter might differ
 significantly from each other. Various aspects such as Linux
@@ -275,7 +275,7 @@ typical configuration for the access log might look like the following:
 
         LogFormat "%h %l %u %t \"%r\" %>s %b" common
         CustomLog logs/access_log common
-                
+
 
 This defines the nickname *common* and associates it with a particular
 log format string. The format as shown is known as the Common Log Format
@@ -284,7 +284,7 @@ read by most log analysis programs. Log file entries produced in CLF
 will look similar to this line:
 
         127.0.0.1 - bob [10/Oct/2000:13:55:36 -0100] "GET /apache_pb.gif HTTP/1.0" 200 2326
-                
+
 
 CLF contains the following fields:
 
@@ -321,7 +321,7 @@ entries. For example, here is a typical message:
 
         [Wed Oct 11 14:32:52 2000] [error] [client 127.0.0.1] client denied by server \
         configuration: /export/home/live/ap/htdocs/test
-                
+
 
 The first item in the log entry is the date and time of the message. The
 second item lists the severity of the error being reported. The
@@ -348,7 +348,7 @@ During testing, it is often useful to continuously monitor the error log
 for any problems. On Unix systems, you can accomplish this using:
 
         tail -f error_log
-                
+
 
 Knowing how to customize Apache logging may prove to be a very usable
 skill. Manually reviewing Apache logs is not for the faint of heart. For
@@ -413,7 +413,7 @@ within the modules directory as shown by the following example:
 
         [user@redhatbased /etc/httpd]$ pwd -P
         /usr/lib64/httpd/modules
-                
+
 
 In the example above, the symbolic link `/etc/httpd/modules` provides
 for easy reference to the modules from within Apache configuration
@@ -454,7 +454,7 @@ standard Apache distribution.
     to:
 
         LoadModule mod_access_compat modules/mod_access_compat.so
-                                    
+
 
 `mod_authn_anon`
 
@@ -547,7 +547,7 @@ standard Apache distribution.
          Require ip: 10.9.9.9/32
          Require forward-dns: cloudhost.sue.nl
          Require local
-                                    
+
 
 One of the noteworthy differences between Apache 2.2 and 2.4 lies in the
 directives used for authorization. The authorization functionality is
@@ -579,7 +579,7 @@ First, the pre-2.4 style:
         Require group employees
         Satisfy any
         </Directory>
-                
+
 
 And now the same codeblock, but using the Apache 2.4 style syntax:
 
@@ -589,7 +589,7 @@ And now the same codeblock, but using the Apache 2.4 style syntax:
         Require group employees
         </RequireAny>
         </Directory>
-                
+
 
 The benefit of the new syntax is all about efficiency. By accomplishing
 the same functionality with fewer lines, the processing of those lines
@@ -635,14 +635,14 @@ can be used to create a new password file `htpasswdfile
 the user account using the bcrypt algorithm:
 
         htpasswd -cB /path/outside/document/root/htpasswdfile bob
-                
+
 
 The system will ask for the new password twice. To update this file
 anytime later by adding the user "alice", the `-c` option can be ommited
 to prevent the file from being rewritten:
 
         htpasswd -B /path/outside/document/root/htpasswdfile alice
-                
+
 
 Using the brypt algorithm with `htpasswd` also enables the use of the
 `-C` option. Using this option, the computing time used to calculate the
@@ -654,7 +654,7 @@ whilst increasing security. To add the user eve to the existing
 following syntax may be used:
 
         htpasswd -B -C18 /path/outside/document/root/htpasswdfile eve
-                
+
 
 In the examples above, it is suggested that the password file is created
 outside of the webserver document tree. Otherwise, it could be possible
@@ -681,7 +681,7 @@ look as follows:
         Require valid-user
         Documentroot /web/document/root
         </Directory>
-                
+
 
 Consult the contents of your Apache modules directory for the presence
 of mod\_auth\* files. There are multiple authentication and
@@ -717,7 +717,7 @@ configuration file: ApacheAuthType ApacheRequire valid-user
         Require valid-user
         </Files>
         </Directory>
-                    
+
 
 The resource being protected is "any file named foo.bar" in the
 `/home/johnson/public_html` directory *or any underlying subdirectory*.
@@ -739,15 +739,15 @@ to be used, e.g.:
         AuthGroupFile {path to group file}
         AuthName {title for dialog box}
         AuthType Basic
-                
+
 
 The second section of `.htaccess` ensures that only user `{username}`
 can access (GET) the current directory:
 
         <Limit GET>
-        require user {username} 
+        require user {username}
         </Limit>
-                
+
 
 The `Limit` section can contain other directives to ApacheLimit restrict
 access to certain IP addresses or to a group of users.
@@ -766,7 +766,7 @@ password for anyone else:
         Require valid-user
         Satisfy Any
         </Files>
-                
+
 
 ####  User files
 
@@ -782,7 +782,7 @@ Apache or the older `crypt()` routine. You can mix and match.
 
         SYNOPSIS
         htpasswd [ -c ] passwdfile username
-                
+
 
 Here are two examples of using `htpasswd` for creating an Apache
 password file. The first is for creating a new password file while
@@ -791,7 +791,7 @@ user.
 
         $ htpasswd -c /home/joe/public/.htpasswd joe
         $ htpasswd /home/joe/public/.htpasswd stephan
-                
+
 
 **Note**
 Using the `-c` option, the specified password file will be overwritten
@@ -822,13 +822,13 @@ ApacheAuthGroupFile Apache main configuration file:
         AuthGroupFile /var/www/.htgroup
         Require group Management
         ...
-            
+
 
 The associated `.htgroup` file might have the following syntax:
 
         Management: bob alice
         Accounting: joe
-            
+
 
 Now the accounts "bob" and "alice" would have access to the resource but
 account "joe" would not due to the "Require group Management" statement
@@ -862,7 +862,7 @@ page is requested. A very basic page might look like this:
 
         print "Content-type: text/plain\r\n\r\n";
         print "Hello, you perly thing!\n";
-                
+
 
 `mod_perl` also allows you to write new modules in Perl. You have full
 access to the inner workings of the web server and can intervene at any
@@ -903,14 +903,14 @@ these commands will suffice:
         $ perl Makefile.PL APACHE_SRC=../apache_x.x.x/src \
         DO_HTTPD=1 USE_APACI=1 EVERYTHING=1
         $ make && make test && make install
-                    
+
 
 After building the module, you should also build the Apache server. This
 can be done using the following commands:
 
         $ cd ${the-name-of-the-directory-with-the-sources-for-Apache}
         $ make install
-                    
+
 
 All that's left then is to add a few configuration lines to
 `httpd.conf` (the Apache configuration file) and start the server. Which
@@ -922,16 +922,16 @@ to use `mod_perl` as a [DSO](#DSO):
 
         LoadModule perl_module modules/libperl.so
         AddModule mod_perl.c
-        PerlModule Apache::Registry 
+        PerlModule Apache::Registry
 
-        Alias /perl/ /home/httpd/perl/ 
+        Alias /perl/ /home/httpd/perl/
         <Location /perl>
-        SetHandler perl-script 
-        PerlHandler Apache::Registry 
+        SetHandler perl-script
+        PerlHandler Apache::Registry
         Options +ExecCGI
-        PerlSendHeader On 
+        PerlSendHeader On
         </Location>
-                    
+
 
 The first two lines will add the `mod_perl` module when Apache starts.
 During startup, the `PerlModule` directive ensures that the named Perl
@@ -976,12 +976,12 @@ the `make` process first. To tell `configure` to build the module as a
 [DSO](#DSO), you need to tell it to use [APXS](#apache-extension-apxs-support-tool):
 
         ./configure -with-apxs
-                
+
 
 .. or, in case you want to specify the location for the `apxs` binary:
 
         ./configure -with-apxs={path-to-apxs}/apxs
-                
+
 
 Next, you can compile PHP by running the `make` command. Once all the
 source files are successfully compiled, install PHP by using the
@@ -994,8 +994,8 @@ File types are controlled in the `httpd.conf` file, and it usually
 includes lines about PHP that are commented out. You may want to search
 for these lines and uncomment them:
 
-        Addtype application/x-httpd-php .php 
-                
+        Addtype application/x-httpd-php .php
+
 
 Then restart Apache by issuing the `apachectl restart` command. The
 `apachectl` command is another way of passing commands to the Apache
@@ -1010,7 +1010,7 @@ To test whether it actually works, create the following page:
         <?php phpinfo( ) ?>
         </BODY>
         </HTML>
-                
+
 
 Save the file as `test.php` in Apache's `htdocs` directory and aim your
 browser at `http://localhost/test.php`. A page should appear with the
@@ -1019,8 +1019,8 @@ that PHP commands are contained by `<?` and `?>` tags.
 
 ####  The httpd binary {#apachehttpd}
 
-The `httpd` binary is the actual HTTP server component of Apache. 
-During normal operation, it is recommended to use the `apachectl` or 
+The `httpd` binary is the actual HTTP server component of Apache.
+During normal operation, it is recommended to use the `apachectl` or
 `apache2ctl` command to controlthe httpd daemon. On some distributions
 the `httpd` binary is named `apache2`.
 
@@ -1142,8 +1142,8 @@ effort, will always remain a trade off.
     content.
 
 The `<VirtualHost>` directive is the next step to create for each
-different webdomain you would like to serve. The argument to the 
-`<VirtualHost>` directive should be the same as the argument to 
+different webdomain you would like to serve. The argument to the
+`<VirtualHost>` directive should be the same as the argument to
 the (pre-Apache 2.4) `NameVirtualHost` directive (i.e., an IP address
 or `*` for all addresses). Inside each `<VirtualHost>` block you will
 need, at minimum, a `ServerName` directive to designate which host is
@@ -1165,7 +1165,7 @@ the IP address `111.22.33.44`. You could then add the following to
             ServerName www.otherdomain.tld
             DocumentRoot /www/otherdomain
         </VirtualHost>
-                    
+
 
 The IP address `111.22.44.33` could be replaced by `*` to match all IP
 addresses for this server. The implications of using wildcards in this
@@ -1180,8 +1180,8 @@ functionality, but one of them uses the `ServerAlias` directive. The
 If, for example, you add the following to the first \<VirtualHost\>
 block above
 
-        ServerAlias domain.tld *.domain.tld 
-                    
+        ServerAlias domain.tld *.domain.tld
+
 
 then requests for all hosts in the `domain.tld` domain will be served by
 the `www.domain.tld` virtual host. The wildcard characters `*` and `?`
@@ -1276,7 +1276,7 @@ installation, use the `Listen` directive in the configuration file to
 select which IP address (or virtual host) that daemon services:
 
         Listen 123.45.67.89:80
-                        
+
 
 The `Listen` directive may be defined as an IP:PORT combination
 seperated by colons as above. Another option is to specify only the port
@@ -1285,7 +1285,7 @@ listeners on all configured IP addresses on the specified port(s):
 
         Listen 80
         Listen 443
-                        
+
 
 The above `Listen` configuration could also be defined using `0.0.0.0`
 as the IP address, again using the colon as a seperator.
@@ -1299,7 +1299,7 @@ port 8443::
         Listen 80
         Listen 443
         Listen 8443 https
-                        
+
 
 When configuring one or more Apache daemons, the `Listen` directive may
 be used to specify one or more ports above 1024. This will prevent the
@@ -1338,7 +1338,7 @@ configuration directives to different values for each virtual host.
             ErrorLog /groups/unix_nl/logs/error_log
             TransferLog /groups/unix_nl/logs/access_log
         </VirtualHost>
-                        
+
 
 ####  Customizing file access {#redirective}
 
@@ -1348,4 +1348,4 @@ This allows you to tell the clients where to look for the relocated
 document.
 
         Redirect {old-URI} {new-URI}
-                
+

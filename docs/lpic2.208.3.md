@@ -118,8 +118,8 @@ proxy. The most basic way to perform access control is to use the
     to have more than one `cache_dir` option in your config file. This
     option can have four parameters:
 
-            cache_dir /usr/local/squid/cache/ 100 16 256 
-                                
+            cache_dir /usr/local/squid/cache/ 100 16 256
+
 
     The first option determines in which directory the cache should be
     maintained. The next option is a size value in Megabytes where the
@@ -140,8 +140,8 @@ proxy. The most basic way to perform access control is to use the
     else, your options might look like this:
 
             acl home src 10.0.0.0/255.0.0.0
-            http_access allow home 
-                                
+            http_access allow home
+
 
     The first line sets up an Access Control List class called "home" of
     an internal network range of ip addresses. The second line allows
@@ -198,7 +198,7 @@ and write rewritten URLs or blank lines on standard output. Also,
 can use to make a decision. The input line consists of four fields:
 
         URL ip-address/fqdn ident method
-                
+
 
 -   The URL originally requested.
 
@@ -215,12 +215,12 @@ A parameter that is not known or specified is replaced by a dash.
 A sample redirector input line:
 
         ftp://ftp.gnome.org/pub/GNOME/stable/releases/gnome-1.0.53/README 192.168.12.34/- - GET
-                
+
 
 A sample response:
 
         ftp://ftp.net.lboro.ac.uk/gnome/stable/releases/gnome-1.0.53/README 192.168.12.34/- - GET
-                
+
 
 It is possible to send an HTTP redirect to the new URL directly to the
 client, rather than have `squid` silently fetch the alternative URL. To
@@ -239,7 +239,7 @@ your own redirector:
         s@http://fromhost.com@http://tohost.org@;
         print;
         }
-                
+
 
 This Perl script replaces requests to "http://fromhost.com" with
 "http://tohost.org".
@@ -320,9 +320,9 @@ Example configuration file with multiple directors:
         #auth_param basic children 5 startup=5 idle=1
         #auth_param basic realm Squid proxy-caching web server
         #auth_param basic credentialsttl 2 hours
-                
 
-####  Access policies 
+
+####  Access policies
 
 Many `squid.conf` options require the use of Access Control Lists
 squidsquid.conf (ACLs). Each ACL consists of a name, type and value (a
@@ -356,7 +356,7 @@ the following:
 
         http_access allow ourallowedhosts
         http_access deny all
-                
+
 
 If a user from 192.168.1.2 connects using TCP and requests an URL,
 `squid` will work it's way through the list of `http_access` lines. It
@@ -378,7 +378,7 @@ Web except during lunchtime:
         acl allowed_hosts src 192.168.1.0/255.255.255.0
         acl lunchtime MTWHF 12:00-13:00
         http_access allow allowed_hosts lunchtime
-                
+
 
 The `MTWHF` string denotes the proper days of the week, where `M`
 specifies Monday, `T` specifies Tuesday and so on. `WHFAS` means
@@ -395,7 +395,7 @@ names:
         http_access deny adults
         http_access allow ourallowedhosts
         http_access deny all
-                
+
 
 These lines prevent access to the web-cache (`http_access`) to users who
 request sites listed in the `adults` ACL. If another site is requested,
@@ -412,7 +412,7 @@ access to the web-cache using that `ACL`. Here's an example:
         authenticate_program /sbin/my_auth -f /etc/my_auth.db
         acl name proxy_auth REQUIRED
         http_access allow name
-                
+
 
 The ACL points to the external authenticator `/sbin/my_auth`. If a user
 wants access to the webcache (the `http_access` function), you would
@@ -450,9 +450,9 @@ one yourself! This means that properly authorized people would be
 misunderstood and puzzles many novice `squid` administrators. A common
 solution is to add an extra line, like this:
 
-        http_access allow name 
+        http_access allow name
         http_access allow all
-                
+
 
 ####  Utilizing memory usage
 

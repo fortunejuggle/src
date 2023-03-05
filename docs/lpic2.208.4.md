@@ -73,7 +73,7 @@ reverse proxy setup might look like this:
           proxy_set_header Host      $host;
           proxy_pass       http://localhost:8000;
     }
-                    
+
 
 In this example all requests received by Nginx, depending on the
 configuration of the server parameters in `/etc/nginx/nginx.conf`, are
@@ -81,18 +81,18 @@ forwarded to an HTTP server running on localhost and listening on port
 8000. The Nginx configuration file looks like this:
 
     server {
-        listen   80; 
+        listen   80;
 
-        root /var/www/; 
+        root /var/www/;
         index index.php index.html index.htm;
 
-        server_name example.com www.example.com; 
+        server_name example.com www.example.com;
 
         location / {
             try_files $uri $uri/ /index.php;
         }
 
-        location ~ \.php$ {    
+        location ~ \.php$ {
             proxy_set_header X-Real-IP  $remote_addr;
             proxy_set_header X-Forwarded-For $remote_addr;
             proxy_set_header Host $host;
@@ -103,7 +103,7 @@ forwarded to an HTTP server running on localhost and listening on port
             deny all;
         }
     }
-                    
+
 
 The line starting with `location  ~ /\.ht` is added to prevent Nginx of
 displaying the content of Apache's .htaccess files. The *try\_files*
@@ -119,7 +119,7 @@ A basic Nginx configuration, able to serve html files, looks like this:
 
     server {
         # This will listen on all interfaces, you can instead choose a specific IP
-        # such as listen x.x.x.x:80;  
+        # such as listen x.x.x.x:80;
         listen 80;
 
         # Here you can set a server name, you can use wildcards such as *.example.com
@@ -128,19 +128,19 @@ A basic Nginx configuration, able to serve html files, looks like this:
         server_name example.com www.example.com;
 
         # It is best to place the root of the server block at the server level, and not the location level
-        # any location block path will be relative to this root. 
+        # any location block path will be relative to this root.
         root /usr/local/www/example.com;
 
-        # Access and error logging. NB: Error logging cannot be turned off. 
+        # Access and error logging. NB: Error logging cannot be turned off.
         access_log /var/log/nginx/example.access.log;
         error_log /var/log/nginx/example.error.log;
 
-        location / { 
+        location / {
             # Rewrite rules and other criterias can go here
             # Remember to avoid using if() where possible (http://wiki.nginx.org/IfIsEvil)
         }
     }
-                    
+
 
 For PHP support Nginx relies on a PHP fast-cgi spawner. Preferable is
 `php-fpm` which can be found at
@@ -155,7 +155,7 @@ configuration file of Nginx. Create a file, for example `php.conf` and
 include the next line at the end of the Nginx main configuration file:
 
     include php.conf;
-                    
+
 
 The content of `php.conf` :
 
@@ -194,5 +194,5 @@ The content of `php.conf` :
 
         # If using a TCP connection...
         fastcgi_pass 127.0.0.1:9000;
-    }       
-                    
+    }
+

@@ -51,7 +51,7 @@ checked for syntax errors using either of the following commands:
 
         $ sudo apachectl configtest
         $ sudo service httpd configtest
-            
+
 
 Because Apache usually serves a daemon that listens to ports below 1024,
 sudo or a root shell should be used to invoke all Apache related
@@ -71,12 +71,12 @@ Just two more examples to get you started: To show all configured
 virtual hosts, use:
 
         $ sudo apachectl -t -D DUMP_VHOSTS
-                
+
 
 To show all currently running websites, use:
 
         $ sudo apachectl -S
-                
+
 
 Be careful interpreting the output from the command above. That output
 shows the configuration of the currently *running* websites. There is no
@@ -112,7 +112,7 @@ stopped by a SysV script instead. Look within the `
 to reveal the available arguments:
 
         $ sudo /etc/init.d/apache2
-                
+
 
 ###   Encrypted webservers: SSL
 
@@ -219,7 +219,7 @@ file:
         Listen 443
         <Vhost>
         </Vhost>
-                    
+
 
 It can very well be that these directives are configured amongst several
 configuration files. This depends on your Linux distribution. In
@@ -232,12 +232,12 @@ package. Apachemod\_ssl On Red Hat based systems, this is done using the
 following command:
 
         $ sudo yum install httpd mod_ssl
-                
+
 
 On Debian-based systems, this is done using the following command:
 
         $ sudo apt-get install apache2 openssl
-                
+
 
 After installation, make sure the OpenSSL module is enabled within
 Apache. The module should be available to the Apache daemon, and
@@ -252,10 +252,10 @@ systems come with a utility called `a2enmod`. By invoking this command
 as follows:
 
         $ sudo a2enmod enable ssl
-                
 
-`a2enmod` will create symlinks within the `mods-enabled 
-                directory, pointing to respectively 
+
+`a2enmod` will create symlinks within the `mods-enabled
+                directory, pointing to respectively
                 mods-available/ssl.conf` and `mods-available/ssl.load`.
 When Apache is reloaded, these symlinks will ensure the SSL module will
 be loaded as well.
@@ -268,7 +268,7 @@ based system, this could be achieved by a `
 INCLUDE directive:
 
         Include conf.d/*conf
-                
+
 
 The default file `/etc/httpd/conf.d/ssl.conf
                 ` could then contain the following `LoadModule` and
@@ -276,7 +276,7 @@ The default file `/etc/httpd/conf.d/ssl.conf
 
         LoadModule ssl_module modules/mod_ssl.so
         Listen 443
-                
+
 
 After reloading Apache, the SSL module should be loaded together with
 the Apache daemon. It is always a good practice to check for
@@ -338,7 +338,7 @@ Directory /etc/ssl/ {#apachessl}
                     drwxr-xr-x 3 root root     16384 2011-03-06 15:31 certs
                     -rw-r--r-- 1 root root      9374 2010-09-24 22:05 openssl.cnf
                     drwx--x--- 2 root ssl-cert  4096 2011-03-06 13:19 private
-                
+
 
 openssl The `openssl` program is a command line interface to the OpenSSL
 crypto library. You can use it to generate certificates, encrypt and
@@ -414,7 +414,7 @@ More specifically:
 **Note**
 You can create a signing request and then sign it yourself. In fact,
 that is what Certificate Authorities do when they create their
-`root certificate`. A `root 
+`root certificate`. A `root
                 certificate` is simply a certificate that says that they
 say they are whom they say they are. So, anybody can create a root
 certificate and put any credentials on it just as they please. The root
@@ -431,7 +431,7 @@ stored in a file named `server.key` in the default format (which is
 known as PEM), type:
 
         $ openssl genrsa -des3 -out server.key 2048
-                
+
 
 RSA keysizes below 1024 bits are considered out-of-date. 1024 bits seems
 to be a best practice today, with 2048, 3072, 4096 and onwards being
@@ -448,7 +448,7 @@ the key file. This can accomplished by reading the key and exporting it
 as follows:
 
         $ openssl rsa -in server.key -out stripped.key
-                
+
 
 The `server.key` file still holds the encrypted private key information
 in ciphertext. The `stripped.key` file is a plain text file with the
@@ -458,7 +458,7 @@ To create a Certificate Signing Request (CSR) with the server RSA
 private key (output will be PEM formatted), execute the following:
 
         $ openssl req -new -key server.key -out server.csr
-                
+
 
 The signing request can now either be sent to a real CA, which will sign
 the request and create a digital certificate, or you can create your own
@@ -533,18 +533,18 @@ example, `newkey.pem` and `newreq.pem` are used as file names by the
         organizationName          = Sue B.V.
         commonName                = ssltest.sue.nl
         X509v3 extensions:
-        X509v3 Subject Key Identifier: 
+        X509v3 Subject Key Identifier:
         83:F3:99:4B:98:E0:F1:37:78:67:DC:04:AC:04:65:03:48:BB:31:FB
-        X509v3 Authority Key Identifier: 
+        X509v3 Authority Key Identifier:
         keyid:83:F3:99:4B:98:E0:F1:37:78:67:DC:04:AC:04:65:03:48:BB:31:FB
 
-        X509v3 Basic Constraints: 
+        X509v3 Basic Constraints:
         CA:TRUE
         Certificate is to be certified until Jul  8 13:49:38 2016 GMT (1095 days)
 
         Write out database with 1 new entries
         Data Base Updated
-                
+
 
 Next create a signing request:
 
@@ -576,7 +576,7 @@ Next create a signing request:
         A challenge password []:
         An optional company name []:
         Request is in newreq.pem, private key is in newkey.pem
-                
+
 
 Then, we sign the request:
 
@@ -597,13 +597,13 @@ Then, we sign the request:
         organizationName          = Sue B.V.
         commonName                = ssltest.sue.nl
         X509v3 extensions:
-        X509v3 Basic Constraints: 
+        X509v3 Basic Constraints:
         CA:FALSE
-        Netscape Comment: 
+        Netscape Comment:
         OpenSSL Generated Certificate
-        X509v3 Subject Key Identifier: 
+        X509v3 Subject Key Identifier:
         21:A4:61:83:B4:E7:C3:E9:2B:2C:0A:DD:36:FA:82:D0:77:3A:E2:01
-        X509v3 Authority Key Identifier: 
+        X509v3 Authority Key Identifier:
         keyid:83:F3:99:4B:98:E0:F1:37:78:67:DC:04:AC:04:65:03:48:BB:31:FB
 
         Certificate is to be certified until Jul  9 13:53:53 2014 GMT (365 days)
@@ -614,7 +614,7 @@ Then, we sign the request:
         Write out database with 1 new entries
         Data Base Updated
         Signed certificate is in newcert.pem
-                
+
 
 You now created a certificate signed by your own CA (`newcert.pem`). You
 might want to rename the file to something more distinguishable, e.g
@@ -640,7 +640,7 @@ refer to them using lines like these:
 
         SSLCertificateFile    /path/to/Certificate:ssltest.sue.nl
         SSLCertificateKeyFile /path/to/PrivateKey:ssltest.sue.nl
-                
+
 
 It is considered a best practice to follow the 'least privilege'
 principle when managing key and certificate files. These files should
@@ -697,7 +697,7 @@ keypair:
         writing new private key to '/etc/ssl/webserver/apache.key'
         # ls /etc/ssl/webserver/
         apache.key  apache.pem
-            
+
 
 **Note**
 During creation, openssl wil use the contents of `/etc/ssl/openssl/cnf`
@@ -746,7 +746,7 @@ the `/etc/apache2/mods-available` directory:
         autoindex.load        headers.load       proxy_balancer.load  vhost_alias.load
         cache.load            ident.load         proxy.conf
         cern_meta.load        imagemap.load      proxy_connect.load
-                
+
 
 `ssl` appears to be available but has not been enabled yet because both
 ssl files, `ssl.load` and `ssl.conf`, are still present in the
@@ -770,7 +770,7 @@ Let's enable SSL:
         [ ok ] Restarting web server: apache2 ... waiting .
         # apachectl status |grep -i ssl
         Server Version: Apache/2.2.22 (Debian) PHP/5.4.4-15.1 mod_ssl/2.2.22 OpenSSL/
-                
+
 
 SSL has now been enabled on the Apache HTTP server. In order for a site
 to actually use SSL, it's configuration has to be properly configured.
@@ -779,7 +779,7 @@ apache config of Debian. Add the following line to your
 `/etc/apache2/ports.conf` file:
 
         Listen 443
-                
+
 
 Now, all sites that want to make use of SSL need to have their
 configuration files reconfigured. The following lines need to be added
@@ -788,7 +788,7 @@ to each "enabled" site that should serve it's content by HTTPS:
         SSLEngine On
         SSLCertificateFile /etc/ssl/webserver/apache.pem
         SSLCertificateKeyFile /etc/ssl/webserver/apache.key
-                
+
 
 An example site configuration file for both a HTTP and HTTPS enabled
 site could be like the following:
@@ -810,7 +810,7 @@ site could be like the following:
         DocumentRoot    /srv/http
         ErrorLog    /var/log/apache2/error.log
         </VirtualHost>
-                
+
 
 Now, use `apachectl configtest` to test your site configuration and if
 no errors occur restart the Apache HTTP server. The SSL enabled sites
@@ -1035,8 +1035,8 @@ following directives, the list of ciphers that Apache offers to client
 software can be limited:
 
         SSLCipherSuite
-        SSLProtocol 
-            
+        SSLProtocol
+
 
 The following section shows an example configuration on how these
 directives may be used. The `SSLCipherSuite` is configured to use strong
@@ -1053,7 +1053,7 @@ known CRIME (Compression Ratio Info-leak Made Easy) attack vector.
         SSLProtocol -All +TLSv1.2
         SSLHonorCipherOrder On
         SSLCompression Off
-            
+
 
 From Apache 2.4 on, `mod_ssl` dropped support for SSLv2. Only SSLv3 and
 TLS are supported. Be aware that support for recent TLS versions depends
