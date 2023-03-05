@@ -26,15 +26,17 @@
 
 ###   Terms and Utilities
 
--   `smbd, nmbd`
+-   `smbd, nmbd, winbindd`
 
--   `smbstatus, testparm, smbpasswd, nmblookup`
+-   `smbcontrol, smbstatus, testparm, smbpasswd, nmblookup`
 
 -   `smbclient`
 
 -   `samba-tool`
 
 -   `net`
+
+-   `mount.cifs`
 
 -   `/etc/smb/`
 
@@ -105,7 +107,7 @@ Report on current Samba connections:
         $ smbstatus
 
         Samba version 4.1.12
-        PID     Username      Group         Machine                        
+        PID     Username      Group         Machine
         -------------------------------------------------------------------
         23632     nobody        nobody        10.20.24.186 (ipv4:10.20.24.186:49394)
 
@@ -114,7 +116,7 @@ Report on current Samba connections:
         public       23632   10.20.24.186  Sat Oct 10 10:15:11 2015
 
         No locked files
-                        
+
 
 ####  testparm
 
@@ -142,7 +144,7 @@ password on the local machine. This is similar to the way the
 `passwd`(1) program works. When run by root it can be used to manage
 user accounts in the configured password backend. Please note that even
 though this utility is called `smbpasswd` it doesn't necessarily write
-the changes to the `smbpasswd` file. `smbpasswd` works on the `passdb 
+the changes to the `smbpasswd` file. `smbpasswd` works on the `passdb
                     backend` configured in `smb.conf`. See also [Account
 information databases](#passdb_backend).
 
@@ -319,9 +321,9 @@ omitted, `net` will try to determine it automatically. Not all commands
 are available on all protocols.
 
 The functionality of the `net` is too extensive to cover in this
-section. Have a look at `man 
+section. Have a look at `man
                     net` or `net help` to show a list of available
-commands and command line options. `net help 
+commands and command line options. `net help
                     <command>` will give command specific information:
 
         $ net help user
@@ -365,12 +367,12 @@ commands and command line options. `net help
             -k or --kerberos        Use kerberos (active directory) authentication
             -C or --comment=<comment> descriptive comment (for add only)
             -c or --container=<container> LDAP container, defaults to cn=Users (for add in ADS only)
-                        
+
 
 Using `net` to get a list of shares from server "sambaserver":
 
         $ net -S sambaserver -U alice share
-        Enter alice's password: 
+        Enter alice's password:
         public
         share1
         share2
@@ -378,13 +380,13 @@ Using `net` to get a list of shares from server "sambaserver":
         IPC$
         alice
         Printer_2
-                        
+
 
 Using `net` to get the current time of server "sambaserver":
 
         $ net -S sambaserver time
         Sat Oct 10 10:10:04 2015
-                        
+
 
 ###   Commands not part of the Samba core
 
@@ -425,7 +427,7 @@ credentials
 
             username=value
             password=value
-                                            
+
 
 uid
 
@@ -461,15 +463,15 @@ rw/ro
 
 Example command line usage:
 
-        smbmount //windows/winshare2 /opt/winshare2 -o \ 
+        smbmount //windows/winshare2 /opt/winshare2 -o \
             username=alice.jones,password=Alice,uid=nobody,gid=nobody,fmask=775,dmask=775,rw,hard
-                        
+
 
 Example of `/etc/fstab` usage:
 
-        //windows/winshare2 /opt/winshare2 smbfs \ 
+        //windows/winshare2 /opt/winshare2 smbfs \
             username=alice.jones,password=Alice,uid=nobody,gid=nobody,fmask=775,dmask=775,rw,hard ://windows/winshare2 0 0
-                        
+
 
 ###   Samba logging
 
@@ -488,7 +490,7 @@ Logging can be configured with global parameters in the Samba
 configuration. See [Configuration parameters](#smbconfigparams) for a
 few of the most useful parameters.
 
-###   Account information databases 
+###   Account information databases
 
 Samba can be configured to use different backends to
 store or retrieve account information. The most important are desribed
@@ -566,10 +568,11 @@ There are three special sections within the samba configuration file:
 
             smbclient //sambaserver/alice -U alice
             smbclient //sambaserver/homes -U alice
-                                            
+
 
     Both these commands will result in access to the home directory of
     user "alice".
+    If no home exits, the incoming share name is assumed to be a username and the server creates the share on the fly by cloning the \[homes\] section. Then the share name is changed from homes to the located username.
 
 \[printers\]
 -   samba
@@ -580,7 +583,7 @@ There are three special sections within the samba configuration file:
     Note: individual printers can also be made available as a service
     with the `printable` parameter.
 
-####  Configuration parameters 
+####  Configuration parameters
 
 In this section the most important configuration options are explained,
 grouped by Samba configuration section (type). Most can also be found in
@@ -671,7 +674,7 @@ passdb backend
     :   Old plaintext passdb backend. Optionally takes a path to the
         smbpasswd file as an argument.
 
-        Example: `passdb backend = 
+        Example: `passdb backend =
                                                                 smbpasswd:/etc/samba/smbpasswd`
 
     tdbsam\[:argument\]
@@ -679,7 +682,7 @@ passdb backend
     :   TDB based password storage backend. Optionally takes a path to
         the TDB file as an argument.
 
-        Example: `passdb backend = 
+        Example: `passdb backend =
                                                                 tdbsam:/etc/samba/private/passdb.tdb`
 
     ldapsam\[:argument\]
@@ -687,7 +690,7 @@ passdb backend
     :   LDAP backend. Optionally takes an LDAP URL as an argument.
         (defaults to "ldap://localhost")
 
-        Example: `passdb backend = 
+        Example: `passdb backend =
                                                                 ldapsam:ldap://localhost`
 
 username map
@@ -713,7 +716,7 @@ username map
     Here is an example:
 
             username map = /usr/local/samba/private/usermap.txt
-                                                
+
 
     Example content of `usermap.txt`:
 
@@ -723,7 +726,7 @@ username map
             readonly = glen fred terry sarah
             lachlan = "Lachlan Smith"
             users = @sales
-                                                
+
 
 guest ok
 
@@ -907,19 +910,15 @@ accomplish the following:
 
     -   [Make share share1 available to alice](#smbexample2)
 
-    -   [Make share share2 available to authenticated
-        users](#smbexample3)
+    -   [Make share share2 available to authenticated users](#smbexample3)
 
-    -   [Make the home directories available to their respective
-        owners](#smbexample4)
+    -   [Make the home directories available to their respective owners](#smbexample4)
 
     -   [Map remote user alice.jones to user alice](#smbexample5)
 
-    -   [Make shares on windows available to users on
-        sambaclient](#smbexample6)
+    -   [Make shares on windows available to users on sambaclient](#smbexample6)
 
-    -   [Allow everyone to print on all printers on
-        sambaserver](#smbexample7)
+    -   [Allow everyone to print on all printers on sambaserver](#smbexample7)
 
     -   [Disallow printing on Printer\_1 from sambaclient](#smbexample8)
 
@@ -940,10 +939,10 @@ Basic global section needed to support the following examples:
           map to guest = bad user
           hosts allow =
           valid users =
-          guest ok = no
-                    
+          guest ok = no # is default and can be omitted
 
-###   Example: Make "public" share available to everyone 
+
+###   Example: Make "public" share available to everyone {#smbexample1}
 
 The configuration section inserted or modified to implement this
 example:
@@ -955,17 +954,18 @@ example:
           writeable = yes
           guest ok = yes
           # valid users =
-                    
+
 
 -   The section `[public]` is added.
 
+-   The comments `%L` is extended to the NetBIOS name of the server.
 -   The path that is made accessible by this service is
     `/export/public`.
 
 -   The service is made browsable so a client can browse to the service
     by connecting directly to the Samba server.
 
--   The service is made writable.
+-   The service is made writable. (default = "no")
 
 -   Guest access is enabled so no authentication is needed.
 
@@ -994,7 +994,7 @@ the test file to the share.
 
                 54864 blocks of size 131072. 47234 blocks available
         smb: \>
-                    
+
 
 Output of smbstatus showing the session from user "nobody" which is our
 (default) configured Linux account for "guest" and checking the test
@@ -1003,7 +1003,7 @@ file on the "public" share:
         $ smbstatus
 
         Samba version 4.1.12
-        PID     Username      Group         Machine                        
+        PID     Username      Group         Machine
         -------------------------------------------------------------------
         24265     nobody        nobody        10.20.27.158 (ipv4:10.20.27.158:49009)
 
@@ -1018,9 +1018,9 @@ file on the "public" share:
         total 0
         -rwxr--r--. 1 nobody nobody 0 Oct 21 09:16 jack.txt
         -rw-r--r--. 1 root   root   0 Oct 21 07:45 public.txt
-                    
 
-###   Example: Make "share1" share available to alice 
+
+###   Example: Make "share1" share available to alice {#smbexample2}
 
 The configuration section inserted or modified to implement this
 example:
@@ -1032,7 +1032,7 @@ example:
           browsable = yes
           writeable = yes
           valid users = alice
-                    
+
 
 -   The section `[share1]` is added.
 
@@ -1053,22 +1053,22 @@ example:
 Failing attempt to access share1 as fred:
 
         $ smbclient //SAMBASERVER/share1
-        Enter fred's password: 
+        Enter fred's password:
         Domain=[OURGROUP] OS=[Unix] Server=[Samba 4.1.12]
         tree connect failed: NT_STATUS_ACCESS_DENIED
-            
+
 
 Successful attempt to access share1 as alice:
 
         $ smbclient //SAMBASERVER/share1
-        Enter alice's password: 
+        Enter alice's password:
         Domain=[OURGROUP] OS=[Unix] Server=[Samba 4.1.12]
         smb: \> volume
         Volume: |share1| serial number 0xd62d5fc5
         smb: \>
-                    
 
-###   Example: Make "share2" share available to authenticated users
+
+###   Example: Make "share2" share available to authenticated users {#smbexample3}
 
 The configuration section inserted or modified to implement this
 example:
@@ -1080,7 +1080,7 @@ example:
           writeable = no
           # guest ok = no
           # valid users =
-                    
+
 
 -   The section `[share2]` is added.
 
@@ -1105,22 +1105,22 @@ all (and only) authenticated users have access to "share2"
 Failing attempt to access share2 as guest:
 
         $ smbclient //SAMBASERVER/share1
-        Enter jack's password: 
+        Enter jack's password:
         Domain=[OURGROUP] OS=[Unix] Server=[Samba 4.1.12]
         tree connect failed: NT_STATUS_ACCESS_DENIED
-                    
+
 
 Successful attempt to access share2 as an authenticated user:
 
         $ smbclient //SAMBASERVER/share2
-        Enter alice's password: 
+        Enter alice's password:
         Domain=[OURGROUP] OS=[Unix] Server=[Samba 4.1.12]
         smb: \> volume
         Volume: |share2| serial number 0xb954cdf0
         smb: \>
-                    
 
-###   Example: Make the home directories available to their respective owners 
+
+###   Example: Make the home directories available to their respective owners {#smbexample4}
 
 The configuration section inserted or modified to implement this
 example:
@@ -1132,19 +1132,18 @@ example:
           writeable = yes
           # guest ok = no
           # valid users =
-                    
 
--   The section `[public]` is added.
+-   The section [homes] is added.
 
--   The path that is made accessible by this service is
-    `/export/public`.
+-   The path was not given and is set to the user's home directory.
 
--   The service is made browsable so a user can browse to the service by
-    directly connecting to the Samba server.
+-   The meaning of the browseable configuration option is different from other shares; it indicates only
+    that a [homes] section won't show up in the local browse list, not that the [alice] share won't.
 
 -   The service is made writable.
 
--   Guest access is enabled so no authentication is needed.
+-   Guest ok is not set and the global value is used (default = "no")
+    valid users is not set and the global value is used (default = "empty"): all authenticated users have access to this special service.
 
 -   `valid users` is not set and the global value is used (default =
     "empty"): all authenticated users have access to this special
@@ -1153,18 +1152,18 @@ example:
 As "fred" access your home directory on "sambaserver":
 
         $ smbclient //SAMBASERVER/fred
-        Enter fred's password: 
+        Enter fred's password:
         Domain=[OURGROUP] OS=[Unix] Server=[Samba 4.1.12]
         smb: \> volume
         Volume: |fred| serial number 0xce0909dd
         smb: \>
-                    
+
 
 Output of smbstatus showing the session from user "fred":
 
         $ smbstatus
         Samba version 4.1.12
-        PID     Username      Group         Machine                        
+        PID     Username      Group         Machine
         -------------------------------------------------------------------
         24457     fred          fred          10.20.27.158 (ipv4:10.20.27.158:49017)
 
@@ -1173,7 +1172,7 @@ Output of smbstatus showing the session from user "fred":
         fred         24457   10.20.27.158  Wed Oct 21 09:36:34 2015
 
         No locked files
-                        
+
 
 ###   Example: Map remote user "alice.jones" to Linux user "alice" {#smbexample5}
 
@@ -1183,7 +1182,7 @@ Parameter added to the `global` section:
           ...
           username map = /etc/samba/usermap.txt
           ...
-                    
+
 
 Sample contents of `/usr/local/samba/private/usermap.txt`:
 
@@ -1193,7 +1192,7 @@ Sample contents of `/usr/local/samba/private/usermap.txt`:
         readonly = glen fred terry sarah
         lachlan = "Lachlan Smith"
         users = @sales
-                    
+
 
 -   User mapping is a global setting. Login names (most probably Windows
     account names) are mapped to local (Linux) users.
@@ -1206,12 +1205,12 @@ be served instead of "alice.jones".
 Connection from "sambaclient" to "sambaserver" as "alice.jones":
 
         $ smbclient //SAMBASERVER/alice.jones
-        Enter alice.jones's password: 
+        Enter alice.jones's password:
         Domain=[OURGROUP] OS=[Unix] Server=[Samba 4.1.12]
         smb: \> volume
         Volume: |alice| serial number 0x37da1047
-        smb: \> 
-                    
+        smb: \>
+
 
 Output of `smbstatus` on "sambaserver" showing active connections
 doesn't show "alice.jones" but only "alice":
@@ -1219,7 +1218,7 @@ doesn't show "alice.jones" but only "alice":
         $ smbstatus
 
         Samba version 4.1.12
-        PID     Username      Group         Machine                        
+        PID     Username      Group         Machine
         -------------------------------------------------------------------
         23788     alice         alice         10.20.27.158 (ipv4:10.20.27.158:48988)
 
@@ -1228,15 +1227,15 @@ doesn't show "alice.jones" but only "alice":
         alice        23788   10.20.27.158  Wed Oct 21 07:29:39 2015
 
         No locked files
-                    
 
-###   Example: Make shares on "windows" available to users on "sambaclient"
+
+###   Example: Make shares on "windows" available to users on "sambaclient" {#smbexample6}
 
 Using `smbclient` to copy a file to `winshare1` on "windows":
 
         [fred@sambaclient ~]$ echo "file from Fred" > fred.txt
         [fred@sambaclient ~]$ smbclient //windows/winshare1
-        Enter fred's password: 
+        Enter fred's password:
         Domain=[WINDOWS] OS=[Windows 7 Professional 7601 Service Pack 1] Server=[Windows 7 Professional 6.1]
         smb: \> dir
           .                                  DR        0  Tue Oct 27 07:21:20 2015
@@ -1259,13 +1258,13 @@ Using `smbclient` to copy a file to `winshare1` on "windows":
           passwd                              A     1055  Mon Oct 26 09:25:34 2015
 
                 40551 blocks of size 262144. 3397 blocks available
-                    
+
 
 Checking the result on "windows":
 
 ![](images/209-winshare.jpg)
 
-###   Example: Allow everyone to print on all printers on "sambaserver" 
+###   Example: Allow everyone to print on all printers on "sambaserver" {#smbexample7}
 
 The configuration section inserted or modified to implement this
 example:
@@ -1277,9 +1276,11 @@ example:
           browseable = yes
           guest ok = yes
           # valid users = #
-                    
+
 
 -   The special section `[printers]` is added.
+
+-   The %p in the comment puts the printers name in place.
 
 -   Spool files are written to `/var/spool/samba`.
 
@@ -1292,12 +1293,12 @@ example:
 -   Guest access is enabled so no authentication is needed.
 
 Using Windows Explorer on Windows to browse and connnect to (enable)
-printer\_1. 
+printer\_1.
 
 ![](images/209-connect-printer.jpg)
 
 Right click enables connecting to the printer and adding it
-as a Generic text based printer. 
+as a Generic text based printer.
 
 
 ![](images/209-devices.jpg)
@@ -1308,7 +1309,7 @@ page. Checking the spool file of the printer on "sambaserver":
                                        Windows
                                   Printer Test Page
         Congratulations!
-        If you can read this information, you have correctly installed your 
+        If you can read this information, you have correctly installed your
         Generic / Text Only on WINDOWS.
         The information below describes your printer driver and port settings.
         Submitted Time: 11:45:31 AM .10/.26/.2015
@@ -1325,24 +1326,24 @@ page. Checking the spool file of the printer on "sambaserver":
         Driver version: 6.00
         Environment:    Windows NT x86
         Additional files used by this driver:
-         C:\Windows\system32\spool\DRIVERS\W32X86\3\TTYRES.DLL 
+         C:\Windows\system32\spool\DRIVERS\W32X86\3\TTYRES.DLL
         (6.1.7600.16385 (win7_rtm.090713-1255))
          C:\Windows\system32\spool\DRIVERS\W32X86\3\TTY.INI
-         C:\Windows\system32\spool\DRIVERS\W32X86\3\TTY.DLL 
+         C:\Windows\system32\spool\DRIVERS\W32X86\3\TTY.DLL
         (6.1.7600.16385 (win7_rtm.090713-1255))
-         C:\Windows\system32\spool\DRIVERS\W32X86\3\TTYUI.DLL 
+         C:\Windows\system32\spool\DRIVERS\W32X86\3\TTYUI.DLL
         (6.1.7600.16385 (win7_rtm.090713-1255))
          C:\Windows\system32\spool\DRIVERS\W32X86\3\TTYUI.HLP
-         C:\Windows\system32\spool\DRIVERS\W32X86\3\UNIRES.DLL 
+         C:\Windows\system32\spool\DRIVERS\W32X86\3\UNIRES.DLL
         (6.1.7600.16385 (win7_rtm.090713-1255))
          C:\Windows\system32\spool\DRIVERS\W32X86\3\STDNAMES.GPD
          C:\Windows\system32\spool\DRIVERS\W32X86\3\STDDTYPE.GDL
          C:\Windows\system32\spool\DRIVERS\W32X86\3\STDSCHEM.GDL
          C:\Windows\system32\spool\DRIVERS\W32X86\3\STDSCHMX.GDL
         This is the end of the printer test page.
-                    
 
-###   Example: Disallow printing on "Printer\_1" from "sambaclient"
+
+###   Example: Disallow printing on "Printer\_1" from "sambaclient" {#smbexample8}
 
 The configuration section inserted or modified to implement this
 example:
@@ -1355,7 +1356,7 @@ example:
           browseable = yes
           guest ok = yes
           hosts deny = sambaclient
-                    
+
 
 -   A section is created to explicitely match "Printer\_1"
 
@@ -1365,8 +1366,8 @@ example:
 
 -   Print jobs are sent to the local printer queue "Printer\_1"
 
--   The service is not made browseable, so cannot be looked up by
-    connecting to the server
+-   The service is made browsable so it can be looked up by connecting
+    to the server.
 
 -   Guest access is enabled so no authentication is needed.
 
@@ -1387,13 +1388,13 @@ configuration for any exception.
 
 Using `smbclient` to test printing from sambaclient
 
-        $ smbclient //sambaserver/Printer_1/ -c "print /etc/hosts" 
-        Enter alice's password: 
+        $ smbclient //sambaserver/Printer_1/ -c "print /etc/hosts"
+        Enter alice's password:
         Domain=[OURGROUP] OS=[Unix] Server=[Samba 4.1.12]
         tree connect failed: NT_STATUS_ACCESS_DENIED
-                    
 
-###   Example: List available services on "sambaserver"
+
+###   Example: List available services on "sambaserver" {#smbexample9}
 
 This example doesn't need additional configuration.
 
@@ -1401,7 +1402,7 @@ Using `smbclient` to create a listing of "sambaserver". Note the
 comments.
 
         $ smbclient -L //SAMBASERVER
-        Enter fred's password: 
+        Enter fred's password:
         Domain=[OURGROUP] OS=[Unix] Server=[Samba 4.1.12]
 
             Sharename       Type      Comment
@@ -1424,7 +1425,7 @@ comments.
             Workgroup            Master
             ---------            -------
             OURGROUP             SAMBASERVER
-                    
+
 
 ##  Setting up a `nmbd` WINS server
 
@@ -1442,7 +1443,7 @@ configuration file `/etc/samba/smb.conf`:
 
         [global]
         wins support = yes
-                    
+
 
 Be careful, there should not be more than one WINS Server on a network
 and you should not set any of the other WINS parameters, such as "wins
@@ -1452,7 +1453,7 @@ Restart the smb and nmb services to pick up the changed configuration
 
         # service smb restart
         # service nmb restart
-                    
+
 
 ####  Creating logon scripts for clients
 
@@ -1476,7 +1477,7 @@ file `/etc/samba/smb.conf`:
 
         [global]
         logon server = yes
-                
+
 
 The second thing to do is create a share called `[netlogon]` where the
 logon scripts will reside and which is readable to all users:
@@ -1487,7 +1488,7 @@ logon scripts will reside and which is readable to all users:
           browseable = no
           guest ok = no
           writeable = no
-                
+
 
 The definition of the logon script depends on whether you want a script
 per user or per client.
@@ -1497,7 +1498,7 @@ per user or per client.
 Add the following line to the `[netlogon]` section:
 
         logon script = %U.bat
-                    
+
 
 and, assuming the user is "fred", create a file called
 `/home/netlogon/fred.bat`.
@@ -1507,7 +1508,7 @@ and, assuming the user is "fred", create a file called
 Add the following line to the `[netlogon]` section:
 
         logon script = %m.bat
-                    
+
 
 and, assuming the machine is called "workstation1", create a file called
 `/home/netlogon/workstation1.bat`.
@@ -1537,7 +1538,7 @@ the domain is example.com:
 
         nameserver 192.168.1.2
         search example.com
-                
+
 
 When you join the host to the domain Samba tries to register the host in
 the AD DNS zone. For this the `net` utility tries to resolve the
@@ -1550,14 +1551,14 @@ of the server we are adding as a domain member:
 
         127.0.0.1   localhost localhost.localdomain
         192.168.1.3 server2.example.com server2
-                
+
 
 To check if the resolution is correct you can use the `getent` command
 as follows:
 
         $ getent hosts server2
         192.168.1.3 server2.example.com server2
-                
+
 
 ###   Configuring Kerberos
 
@@ -1568,7 +1569,7 @@ Currently Samba uses Heimdal Kerberos. This means that the Kerberos file
             default_realm = EXAMPLE.COM
             dns_lookup_realm = false
             dns_lookup_kdc = true
-                
+
 
 Using anyting other than the above can lead to errors.
 
@@ -1591,7 +1592,7 @@ If not you can use the following command to locate the file:
 
         $ smbd -b | grep CONFIGFILE
         CONFIGFILE: /usr/local/samba/etc/smb.conf
-                    
+
 
 Now that we know where the file is located we can add the following
 configuration:
@@ -1610,7 +1611,7 @@ configuration:
             # - must use a read-write-enabled back end, such as tdb.
             idmap config * : backend = tdb
             idmap config * : range = 3000-7999
-                    
+
 
 ####  Joining the domain
 
@@ -1627,14 +1628,14 @@ When joining an Active Directory domain:
         Enter administrator’s password:
         Using short domain name – EXAMPLE
         Joined ‘server2’ to dns domain ‘example.com’
-                    
+
 
 When joining a NT4 domain:
 
         $ net ads join –U administrator
         Enter administrator’s password:
         Joined domain EXAMPLE.
-                    
+
 
 ####  Configuring the Name Service Switch (NSS)
 
@@ -1644,27 +1645,27 @@ have to append the winbind entry to the following databases in
 
         passwd: files winbind
         group: files winbind
-                    
+
 
 ####  Starting the services
 
 Now we can start the services. If you only need Samba to lookup domain
-users and groups you only have to start the `winbind` service. If you
+users and groups you only have to start the `winbindd` service. If you
 also set up file and printer sharing you also need to start the `smbd`
 and `nmbd` services.
 
         $ systemctl start winbind smbd nmbd
-                    
+
 
 You should NOT start the `samba` service. This service is only required
 on Active Directory Domain Controllers,
 
 ####  Testing the winbind connectivity
 
-To verify if the winbind service is able to connect to Active Directory
+To verify if the winbindd service is able to connect to Active Directory
 Domain Controllers or NT4 Domain Controllers you can use the `wbinfo`
 command:
 
         $ wbinfo --ping-dc
         Checking the NETLOGON for domain[EXAMPLE] dc connection to "server1.example.com" succeeded
-                    
+
