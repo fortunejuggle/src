@@ -920,9 +920,12 @@ accomplish the following:
 
     -   [Allow everyone to print on all printers on sambaserver](#smbexample7)
 
-    -   [Disallow printing on Printer\_1 from sambaclient](#smbexample8)
+    -   [List available services on sambaserver](#smbexample8)
 
-    -   [List available services on sambaserver](#smbexample9)
+    -   [Add share for printer drivers on sambaserver](#smbexample9)
+
+    -   [Disallow printing on Printer\_1 from sambaclient](#smbexample10)
+
 
 ###   Basic \[global\] section to support the examples
 
@@ -1343,7 +1346,64 @@ page. Checking the spool file of the printer on "sambaserver":
         This is the end of the printer test page.
 
 
-###   Example: Disallow printing on "Printer\_1" from "sambaclient" {#smbexample8}
+###   Example: List available services on "sambaserver" {#smbexample8}
+
+This example doesn't need additional configuration.
+
+Using `smbclient` to create a listing of "sambaserver". Note the
+comments.
+
+        $ smbclient -L //SAMBASERVER
+        Enter fred's password:
+        Domain=[OURGROUP] OS=[Unix] Server=[Samba 4.1.12]
+
+            Sharename       Type      Comment
+            ---------       ----      -------
+            public          Disk      Public Storage on sambaserver
+            share1          Disk      Share1 on sambaserver
+            share2          Disk      share2 on sambaserver
+            Printer_1       Printer   Printer 1 on sambaserver
+            IPC$            IPC       IPC Service (Linux Samba Server sambaserver for LPIC2 examples)
+            fred            Disk      fred's homedirectory on sambaserver from sambaclient
+            Printer_2       Printer   Cups printer Printer_2
+        Domain=[OURGROUP] OS=[Unix] Server=[Samba 4.1.12]
+
+            Server               Comment
+            ---------            -------
+            SAMBACLIENT          Samba 4.1.12
+            SAMBASERVER          Linux Samba Server sambaserver for LPIC2 examples
+            SS2                  Linux Samba Server sambaserver for LPIC2 examples
+
+            Workgroup            Master
+            ---------            -------
+            OURGROUP             SAMBASERVER
+
+###   Example: Add share for printer drivers {#smbexample9}
+The configuration section inserted or modified to implement this
+example:
+
+        [print$]
+            comment = Printer Drivers
+            path = /var/lib/samba/printers
+            write list = @printadmin root
+            force group = @printadmin
+            create mask = 0664
+            directory mask = 0775
+
+-   A `[print$]` section is created. The `$` means it is hidden
+
+-   Adds path for the driver location
+
+-   Only the group printadmin and the root user are allowed to write
+
+-   All users will be assigned to the group printadmin.
+
+-   The files in that directory are created with 0664 permission (default = "0744")
+
+-   Directoriy is created with 0775 permission (default = "0755")
+
+
+###   Example: Disallow printing on "Printer\_1" from "sambaclient" {#smbexample10}
 
 The configuration section inserted or modified to implement this
 example:
@@ -1393,38 +1453,27 @@ Using `smbclient` to test printing from sambaclient
         Domain=[OURGROUP] OS=[Unix] Server=[Samba 4.1.12]
         tree connect failed: NT_STATUS_ACCESS_DENIED
 
+### Samba hide files
 
-###   Example: List available services on "sambaserver" {#smbexample9}
+Sometimes it is nessessary to hide specific files. This can be done with either `veto files` or `hidden files`.
+The `veto files` parameter is more restrictive. The files are not visible and not accessible.
+`hidden files` on the other hand are hidden and can be accessed if the filename is known.
 
-This example doesn't need additional configuration.
+Example `veto files`:
 
-Using `smbclient` to create a listing of "sambaserver". Note the
-comments.
+        ; Veto any files containing the word Security,
+        ; any ending in .tmp, and any directory containing the
+        ; word root.
+        veto files = /*Security*/*.tmp/*root*/
 
-        $ smbclient -L //SAMBASERVER
-        Enter fred's password:
-        Domain=[OURGROUP] OS=[Unix] Server=[Samba 4.1.12]
+Example `hidden files`:
 
-            Sharename       Type      Comment
-            ---------       ----      -------
-            public          Disk      Public Storage on sambaserver
-            share1          Disk      Share1 on sambaserver
-            share2          Disk      share2 on sambaserver
-            Printer_1       Printer   Printer 1 on sambaserver
-            IPC$            IPC       IPC Service (Linux Samba Server sambaserver for LPIC2 examples)
-            fred            Disk      fred's homedirectory on sambaserver from sambaclient
-            Printer_2       Printer   Cups printer Printer_2
-        Domain=[OURGROUP] OS=[Unix] Server=[Samba 4.1.12]
+        ; hide any dot files
+        ; any ending in .bpm, .jpg, .png, .gif
 
-            Server               Comment
-            ---------            -------
-            SAMBACLIENT          Samba 4.1.12
-            SAMBASERVER          Linux Samba Server sambaserver for LPIC2 examples
-            SS2                  Linux Samba Server sambaserver for LPIC2 examples
+        hidden files = /.*/*.bmp/*.jpg/*.png/*.gif/
 
-            Workgroup            Master
-            ---------            -------
-            OURGROUP             SAMBASERVER
+If you need to hide dot files you can use the `hide dot files` parameter if your samba is of version > 4.11.6
 
 
 ##  Setting up a `nmbd` WINS server
