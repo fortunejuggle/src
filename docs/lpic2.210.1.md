@@ -17,7 +17,7 @@ maintaining the DHCP server.
 
 -   `dhcpd.leases`
 
--   `/var/log/daemon.log` and `/var/log/messages`
+-   `/var/log/daemon.log` or `/var/log/messages`, `systemd-journal`
 
 -   `arp`
 
@@ -38,20 +38,21 @@ addresses called DHCPv6, although the "Neighbour Discovery Protocol"
 
 The process of requesting and assigning addresses works as follows:
 
--   When a computer starts, it sends a request to the network.
+-   `DHCPDISCOVER` When a computer starts, it sends a broadcast to the network.
+    The client attempts to find a DHCP server on the wire.
 
 -   Any DHCP servers that receive this request decide what address and
     other configuration options to assign to the client. This is
     typically based on things like: which network the request arrived
     on, or the MAC address of the  interface that sent the request.
 
--   Each server sends a packet which offers to assign the address to the
+-   `DHCPOFFER` Each server sends a packet which offers to assign the address to the
     client.
 
--   The client decides which offer to accept, and sends a message to the
+-   `DHCPREQUEST` The client decides which offer to accept, and sends a message to the
     server confirming the choice.
 
--   The server acknowledges that it has recorded this address.
+-   `DHCPACK/DHCPNACK` The server acknowledges that it has recorded this address.
 
 Amongst the most commonly used configuration items are: `ip-address`,
 `host-name`, `domain-name`, `subnet-mask`, `broadcast-address`,
@@ -59,8 +60,8 @@ Amongst the most commonly used configuration items are: `ip-address`,
 
 The information is requested by a DHCP client and provided by a DHCP
 DHCPServer DHCPClient server. By default, the server listens for
-requests on udp port 67 and 67 answers through udp port 68, but it can
-be told to listen to another 68 port instead with the `-p` option. The
+requests on udp port 67 and answers through udp port 68, but it can
+be told to listen to another port instead with the `-p` option. The
 DHCP server will then answer through an udp port with a number one
 higher than the port it listens to.
 
@@ -193,14 +194,14 @@ Subnet-independent services are the services that are available to all
 workstations on the company's network regardless the subnet they are
 on. The table below shows those services and their fixed IP-addresses.
 
-|Service|   Description |IP-address|  Host name|
-|----|----|----|----|
-|  DHCP|         DHCP-server|  21.31.0.1    |  dhcp.company.com|
-|  DNS  |       DNS         |  21.31.0.2    |  dns.company.com|
-|  SMTP  |      SMTP-server |  21.31.0.3     | smtp.company.com|
-|  POP3  |      POP3-server  | 21.31.0.4     | pop3.company.com|
- | NEWS   |     NNTP-server   |21.31.0.5     | news.company.com|
-|NTP  |       NTP-server    |21.31.0.6     | ntp.company.com|
+|Service|   Description |IP-address  |  Host name       |
+|-------|---------------|------------|------------------|
+|  DHCP |   DHCP-server |  21.31.0.1 |  dhcp.company.com|
+|  DNS  |   DNS         |  21.31.0.2 |  dns.company.com |
+|  SMTP |   SMTP-server |  21.31.0.3 |  smtp.company.com|
+|  POP3 |   POP3-server |  21.31.0.4 |  pop3.company.com|
+|  NEWS |   NNTP-server |  21.31.0.5 |  news.company.com|
+|  NTP  |   NTP-server  |  21.31.0.6 |  ntp.company.com |
 
 ####  Subnet dependent services
 
@@ -256,7 +257,7 @@ DHCPnntp-server
         option nntp-server 21.31.0.5;
         # NTP
         option time-servers 21.31.0.6;
-                        
+
 
 Another way to do this is by using domain names. A *single* domain name
 *must* resolve to a *single* IP-address. Using domain names, you would
@@ -272,7 +273,7 @@ put the following entries in the configuration file:
         option nntp-server news.company.com;
         # NTP
         option time-servers ntp.company.com;
-                        
+
 
 ####  The company's shared-networks and subnets
 
@@ -299,17 +300,17 @@ department. The netmask is calculated as follows:
     21.31.31.255 : | 0001 0101 | 0001 1111 | 0001 1111 | 1111 1111 | NETWORK
 
     21.31.32.0 - : | 0001 0101 | 0001 1111 | 0010 0000 | 0000 0000 | ADMINISTRATION
-    21.31.47.255 : | 0001 0101 | 0001 1111 | 0010 1111 | 1111 1111 | NETWORK 
+    21.31.47.255 : | 0001 0101 | 0001 1111 | 0010 1111 | 1111 1111 | NETWORK
 
     21.31.48.0 - : | 0001 0101 | 0001 1111 | 0011 0000 | 0000 0000 | ENGINEERING
     21.31.63.255 : | 0001 0101 | 0001 1111 | 0011 1111 | 1111 1111 | NETWORK
 
-    21.31.64.0 - : | 0001 0101 | 0001 1111 | 0100 0000 | 0000 0000 | MANAGEMENT 
+    21.31.64.0 - : | 0001 0101 | 0001 1111 | 0100 0000 | 0000 0000 | MANAGEMENT
     21.31.79.255 : | 0001 0101 | 0001 1111 | 0100 1111 | 1111 1111 | NETWORK
 
     fixed-bits   : | 1111 1111 | 1111 1111 | 1111 0000 | 0000 0000 | NETMASK
                         255         255         240          0
-                        
+
 
 Using a netmask of 255.255.240.0, the network an IP-address is on can be
 determined. This is done by AND-ing the IP-address with the netmask. To
@@ -319,7 +320,7 @@ determine on which of the four networks a workstation with IP-address
     21.31.57.105 : | 0001 0101 | 0001 1111 | 0011 1001 | 0110 1001 | IP-ADDRESS
     255.255.240.0: | 1111 1111 | 1111 1111 | 1111 0000 | 0000 0000 | AND NETMASK
     21.31.48.0:    | 0001 0101 | 0001 1111 | 0011 0000 | 0000 0000 | GIVES NETWORK
-                        
+
 
 The IP-address 21.31.57.105 is on the 21.31.48.0 network, which is the
 Engineering-network.
@@ -345,10 +346,10 @@ network address:
     0.0.15.255   : | 0000 0000 | 0000 0000 | 0000 1111 | 1111 1111 | OR INV NETMASK
     21.31.63.255 : | 0001 0101 | 0001 1111 | 0011 1111 | 1111 1111 | GIVES BCAST
 
-    21.31.64.0 - : | 0001 0101 | 0001 1111 | 0100 0000 | 0000 0000 | MANAGEMENT 
+    21.31.64.0 - : | 0001 0101 | 0001 1111 | 0100 0000 | 0000 0000 | MANAGEMENT
     0.0.15.255   : | 0000 0000 | 0000 0000 | 0000 1111 | 1111 1111 | OR INV NETMASK
     21.31.79.255 : | 0001 0101 | 0001 1111 | 0100 1111 | 1111 1111 | GIVES BCAST
-                        
+
 
 The broadcast-address for the network an IP-address is on can be
 determined by OR-ing the IP-address with the inverse-netmask. For a
@@ -358,7 +359,7 @@ calculated as follows:
     21.31.57.105 : | 0001 0101 | 0001 1111 | 0011 1001 | 0110 1001 | IP-ADDRESS
     0.0.15.255   : | 0000 0000 | 0000 0000 | 0000 1111 | 1111 1111 | OR INV NETMASK
     21.31.63.255 : | 0001 0101 | 0001 1111 | 0011 1111 | 1111 1111 | GIVES BCAST
-                        
+
 
 The IP-address 21.31.57.105 belongs to a network that has
 broadcast-address 21.31.63.255, which is correct since the IP-address is
@@ -371,7 +372,7 @@ every floor are reserved for printers and routers. This means that for
 every subnet the range statement is:
 
     range 21.31.x.11 21.31.x.210
-                        
+
 
 Where "x" depends on the department and the floor.
 
@@ -457,7 +458,7 @@ configuration-file:
         range 21.31.76.11 21.31.76.210;
       }
     }
-                        
+
 
 ###   Static hosts
 
@@ -511,7 +512,7 @@ DHCP-server's configuration file:
                   option host-name "leah";
           }
     }
-                    
+
 
 ###   Static BOOTP hosts
 
@@ -545,7 +546,17 @@ DHCPBOOTP lines to the DHCP-server's configuration file:
                   option host-name "leah";
           }
     }
-                    
+
+
+There are two other global directive:
+
+    ddns-update-style [style];
+    ; style can be none, standard, interim or ad-hoc
+    ; ad-hoc is retired and is completly removed in version 4.3.0
+
+    [allow,ignore,deny] client-updates;
+
+The client-updates flag tells the DHCP server whether or not to honor the client's intention to do its own update of its A record. This is only relevant when doing interim DNS updates. See the documentation under the heading THE INTERIM DNS UPDATE SCHEME for details.
 
 The `filename` option states the name of the file to get from the server
 defined in the `next-server` option. If the `next-server` is omitted,
@@ -593,7 +604,7 @@ the command line that starts the daemon.
 This is done as follows: DHCPreload
 
     # /etc/init.d/dhcp restart
-                    
+
 
 This will stop the running daemon, wait two seconds, then start a new
 daemon which causes `/etc/dhcpd.conf` to be read again.
@@ -615,7 +626,7 @@ to configure logging of the DHCP server. For example, you might add a
 line like this:
 
         local7.debug /var/log/dhcpd.log
-                    
+
 
 The syntax of the syslog.conf file may be different on some operating
 systems - consult the syslog.conf manual page to be sure. To get syslog
@@ -691,14 +702,14 @@ addresses that hosts configure for themselves.
 
 A typical `radvd.conf` would look similar to the following:
 
-    interface eth0 { 
+    interface eth0 {
             AdvSendAdvert on;
-            MinRtrAdvInterval 3; 
+            MinRtrAdvInterval 3;
             MaxRtrAdvInterval 10;
-            prefix 2001:0db8:0100:f101::/64 { 
-                    AdvOnLink on; 
-                    AdvAutonomous on; 
-                    AdvRouterAddr on; 
+            prefix 2001:0db8:0100:f101::/64 {
+                    AdvOnLink on;
+                    AdvAutonomous on;
+                    AdvRouterAddr on;
             };
     };
-                    
+
