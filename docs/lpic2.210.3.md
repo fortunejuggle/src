@@ -93,7 +93,7 @@ LDIF
             <attrtype>: <attrvalue>
             <attrtype>: <attrvalue>
             <attrtype>: <attrvalue>
-                                
+
 
     Each entry can contain as many `<attrtype>: <attrvalue>` pairs as
     needed. A blank line indicates the end of an entry. A line may be
@@ -147,7 +147,7 @@ Boolean expressions are evaluated in the following order:
 **Examples:**
 
         ldapsearch -h myhost -p 389 -s base -b "ou=people,dc=example,dc=com" "objectclass=*"
-                
+
 
 This command searches the directory server myhost, located at port 389.
 The scope of the search (-s) is base, and the part of the directory
@@ -158,7 +158,7 @@ been requested. The example assumes anonymous authentication because
 authentication options are not specified.
 
         ldapsearch -x "(|(cn=marie)(!(telephoneNumber=9*)))"
-                
+
 
 This example shows how to search for entries that have a cn of marie OR
 do NOT have a telephoneNumber beginning with 9.
@@ -178,9 +178,9 @@ requested to generate a password for the user.
 
 **Example:**
 
-        ldappasswd -x -h localhost -D "cn=root,dc=example,dc=com" \ 
+        ldappasswd -x -h localhost -D "cn=root,dc=example,dc=com" \
             -s secretpassword -W uid=admin,ou=users,ou=horde,dc=example,dc=com
-            
+
 
 Set the password for "uid=admin,ou=users,ou=horde,dc=example,dc=com on
 localhost".
@@ -201,7 +201,7 @@ existing entries. If invoked as `ldapadd`, this option is always set.
 **Example:**
 
         ldapadd -h myhost -p 389 -D "cn=orcladmin" -w welcome -f jhay.ldif
-            
+
 
 Using this command, user orcladmin authenticates to the directory
 myhost, located at port 389. The command then opens the file jhay.ldif
@@ -225,7 +225,7 @@ with those Distinguished Names are deleted.
 
         ldapdelete -h myhost -p 389 -D "cn=orcladmin" -w welcome \
         "uid=hricard,ou=sales,ou=people,dc=example,dc=com"
-            
+
 
 This command authenticates user orcladmin to the directory myhost, using
 the password welcome. Then it deletes the entry

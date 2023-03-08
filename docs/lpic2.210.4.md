@@ -42,6 +42,10 @@ knowledge of LDIF format and essential access controls.
 
 ##  OpenLDAP
 
+OpenLDAP is a distributed directory services. It stores information associated
+with users that can be used to authenticate them for login and provide other information about those users (home directories, roles within the organization, departments etc).
+OpenLDAP is most commonly used in Linux, but con be compared to Active Directory on Windows, as a service provided hierarchical based user information.
+
 OpenLDAP uses `slapd` which is the stand-alone LDAP daemon.
 It listens for LDAP connections on any number of ports (389 by default),
 responding to the LDAP operations it receives over these connections.
@@ -64,28 +68,28 @@ units, people, printers, documents, or just about anything else.
 While the OpenLDAP directory gets filled the protection of data may become
 more critical. Some data might be protected by law or be confidential in
 any other way. Therefore access to the directory needs to be controlled.
-The default policy allows read access to all clients. Regardless of what 
-access control policy is defined, the olcRootDN is always allowed full 
+The default policy allows read access to all clients. Regardless of what
+access control policy is defined, the olcRootDN is always allowed full
 rights (i.e. auth, search, compare, read, and write) on everything.
 
 Access to `slapd` entries and attributes is controlled by the
 `olcAccess` attribute, whose values are a sequence of access rules. They
 begin with the access directive followed by a list of conditions:
 
-        
+
         olcAccess: to <what>
                by <who> <type of access>
                by <who> <type of access>
-                    
+
 
 For example:
 
-        
+
         olcAccess: to attrs=userPassword
                by anonymous auth
                by self write
                by * none
-                    
+
 
 This access specification is used to keep a user's password protected.
 It allows anonymous users an authentication comparison on a password for
@@ -96,14 +100,14 @@ to the password.
 Alternatively we could grant users permission to update all their data
 with access speficifations like the following:
 
-        
+
         olcAccess: to attrs=userPassword
                by anonymous auth
                by * none
         olcAccess: to *
                    by self write
                    by * none
-                    
+
 
 ###   Distinguished Names
 
@@ -114,11 +118,11 @@ attribute and value pair separated by commas.
 
 For example:
 
-        
+
         cn=John Doe,ou=editing,o=Paris,c=F
         cn=Jane Doe,ou=editing,o=London,c=UK
         cn=Tom Jones,ou=reporting,o=Amsterdam,c=NL
-                    
+
 
 Any of the attributes defined in the directory schema may be used to
 make up a DN. The order of the component attribute value pairs is
@@ -133,11 +137,11 @@ An example to create an entry for a person:
 
         dn: cn=John Doe,o=bmi,c=us
         objectclass: top
-        objectclass: person 
-        cn: John Doe 
+        objectclass: person
+        cn: John Doe
         sn: Doe
         telephonenumber: 555-111-5555
-                    
+
 
 Some characters have special meaning in a DN. For example, = (equals)
 separates an attribute name and value and comma separates
@@ -154,9 +158,9 @@ it by a backslash ("\\" ASCII 92). This example shows a method of
 escaping a comma in an organization name:
 
         CN=Supergroup,O=Crosby\, Stills\, Nash and Young,C=US
-                    
 
-###   slapd-config 
+
+###   slapd-config
 
 OpenLDAP 2.3 and later have transitioned to using a dynamic runtime
 configuration engine, `slapd-config`. The older style `slapd.conf` file
@@ -175,7 +179,7 @@ tree `slapd.d` may be located in `/etc/OpenLDAP` or
 
 An example might look like this:
 
-        
+
         /etc/OpenLDAP/slapd.d
         |-- cn=config
         |   |-- cn=module{0}.ldif
@@ -188,7 +192,7 @@ An example might look like this:
         |   |-- olcDatabase={-1}frontend.ldif
         |   `-- olcDatabase={1}hdb.ldif
         `-- cn=config.ldif
-                    
+
 
 The `slapd.d` tree has a very specific structure. The root of the tree
 is named `cn=config` and contains global configuration settings.
@@ -243,7 +247,7 @@ follows:
 
         # subsequent definitions and settings
         ...
-                    
+
 
 For the domain `example.com` the configuration file might look like
 this:
@@ -254,16 +258,16 @@ this:
         olcDatabase: hdb
         olcSuffix: dc=example,dc=com
         olcRootDN: cn=Manager,dc=example,dc=com
-        olcRootPW: secret 
+        olcRootPW: secret
         olcDbDirectory: /var/lib/ldap
-                    
+
 
 It is more secure to generate a password hash using `slappasswd` instead
 of the plain text password secret as in the example above. In that case
 the `olcRootPW` line would be changed into something like the following:
 
         olcRootPW: {SSHA}xEleXlHqbSyi2FkmObnQ5m4fReBrjwGb
-                    
+
 
 The `olcLogLevel` directive specifies at which debugging
 level statements and operation statistics should be syslogged. Log
@@ -286,22 +290,22 @@ Available levels are:
         2048   (0x800 parse) entry parsing
         16384  (0x4000 sync) LDAPSync replication
         32768  (0x8000 none) only messages that get logged whatever log level is set
-                    
+
 
 For example:
 
-        olcLogLevel: -1 
-                    
+        olcLogLevel: -1
+
 
 This will cause lots and lots of debugging information to be logged.
 
         olcLogLevel: conns filter
-                    
+
 
 This will only log the connection and search filter processing.
 
         olcLogLevel: stats
-                    
+
 
 Basic stats logging is configured by default. However, if no olcLogLevel
 is defined, no logging occurs (equivalent to a 0 level).
@@ -324,7 +328,7 @@ Its contents typically looks like this:
         -rw-------. 1 ldap ldap    8192 Dec  2 21:31 dn2id.bdb
         -rw-------. 1 ldap ldap   32768 Dec  2 21:31 id2entry.bdb
         -rw-------. 1 ldap ldap    8192 Dec  2 21:31 objectClass.bdb
-                    
+
 
 ###   LDIF
 
@@ -341,7 +345,7 @@ An example of a LDIF file:
         cn: Johnnie Doe
         objectClass: person
         sn: Doe
-                    
+
 
 Multiple entries are separated using a blank line. `Slapcat` `slapcat`
 can be used to export information from the LDAP database in the LDIF
@@ -350,7 +354,7 @@ format.
 For example:
 
         slapcat -l all.ldif
-                    
+
 
 This will generate a file called `all.ldif` which contains a full dump
 of the LDAP database.
@@ -361,14 +365,14 @@ data into an LDAP database.
 For example:
 
         slapadd -l all.ldif
-                    
+
 
 Sometimes it may be necessary to regenerate LDAP's database indexes.
 This can be done using the `slapindex` tool. `slapindex` It may also be
 used to regenerate the index for a specific attribute like the UID:
 
-        slapindex uid  
-                    
+        slapindex uid
+
 
 Note that `slapd` should not be running (at least, not in read-write
 mode) when the command is run to ensure consistency of the database.
@@ -404,11 +408,11 @@ directive.
 
 For example:
 
-        
+
         include: file:///etc/OpenLDAP/schema/core.ldif
         include: file:///etc/OpenLDAP/schema/cosine.ldif
         include: file:///etc/OpenLDAP/schema/inetorgperson.ldif
-                    
+
 
 The first line imports the core schema, which contains the schemas of
 attributes and object classes necessary for standard LDAP use. The

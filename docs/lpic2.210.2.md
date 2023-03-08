@@ -21,6 +21,8 @@ using various available methods.
 
 -   `pam_unix, pam_cracklib, pam_limits, pam_listfile`
 
+-   `sssd.conf`
+
 ##  What is PAM?
 
 PAM is the acronym for Pluggable Authentication Modules. PAM consists of
