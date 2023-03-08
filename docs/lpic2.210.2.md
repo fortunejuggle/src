@@ -64,7 +64,7 @@ session
 PAM can be configured using the file `/etc/pam.conf` which has the following format:
 
         service   type   control   module-path   module-arguments
-                
+
 
 service
 
@@ -101,6 +101,11 @@ control
     -   The success or failure of this module is only important
         if this is the only module associated with this
         service and this type.
+
+    include
+
+    -   This keyword indicates that you can include the rules in any other file (set of PAM values)
+        allready defined (common inclusion is `system.auth`)
 
 module-path
 
@@ -176,7 +181,7 @@ auth
 
     use\_first\_pass
 
-    -   Use the result from the previous stacked auth module, never 
+    -   Use the result from the previous stacked auth module, never
         prompt the user for a password and fails if the
         result was a fail.
 
@@ -265,7 +270,14 @@ For example purposes the file `/etc/pam.d/login` will be used:
         # password has a minimum (min=4) length of 4 and a maximum (max=8) length of
         # 8 characters.
         password   required   pam_unix.so nullok obscure min=4 max=8
-                    
+
+        # Password is encrypted with yescrypt algorithm (yescrypt)
+        # Try to maintain a shadow based system. (shadow)
+        # Allow the user to change empty passwords. (nullok)
+        # When password changing enforce the module to set the new password. (use_authtok)
+        # The last 20 passwords for each user are saved in /etc/security/opasswd. (remember=20)
+        password   sufficient pam_unix.so yescrypt shadow nullok use_authtok remember=20
+
 
 ###   pam\_nis
 
@@ -286,7 +298,7 @@ trick in `/etc/pam.d/login` are:
         account sufficient pam_ldap.so \
         item=user sense=deny map=cancelled.byname error=expired
         account required   pam_unix.so
-                    
+
 
 ###   pam\_ldap
 
@@ -304,7 +316,19 @@ lines that do the trick in `/etc/pam.d/login` are:
 
         account sufficient pam_ldap.so
         account required   pam_unix.so
-                    
+
+
+### pam\_nologin
+
+This module is a PAM module that prevents users from logging into the system when `/etc/nologin` exists. The contents of the `/etc/nologin` file are displayed to the user. The `pam_nologin` module has no effect on the root user's ability to log in.
+
+The suggested usage for `/etc/pam.d/login` is:
+
+        auth  required  pam_nologin.so
+
+This line will determine if an account has been provided, if unsuccessful, it will deny login.
+If an account has been provided, it is successful and will move to the next line in the module for
+further evaluation.
 
 ###   pam\_cracklib
 
@@ -324,7 +348,7 @@ characters.
         password  required pam_cracklib.so \
         difok=3 minlen=15 dcredit= 2 ocredit=2
         password  required pam_unix.so use_authtok nullok md5
-                    
+
 
 ###   pam\_limits
 
@@ -339,6 +363,11 @@ order of parsing. If a config file is explicitely specified with a
 module option then the files in the above directory are not parsed. The
 module must not be called by a multithreaded application.
 
+        #<domain>      <type>   <item>         <value>
+        ; do not allow the user to login more often than 4 times
+
+        @fred          -        maxlogins       4
+
 ###   pam\_listfile
 
 This module allows or denies an action based on the presence of the item
@@ -348,7 +377,40 @@ parameter item and can have the value of user, tty, rhost, ruser, group,
 or shell. The *sense* configuration parameter determines whether the
 entries in the list are allowed. Possible values are allow and deny.
 
+        ; item=user is matched through the users in the file /etc/users and if the user
+        ; is in the file it is denied
+
+        auth required pam_listfile.so item=user sense=deny file=/etc/users onerr=succeed
+        auth required pam_shells.so
+
+        ; onerr=succeed means that the next pam modules are consolidated in this example pam_shells.so
+
 ###   SSSD
+
+SSSD is an acronym for System Security Services Daemon. It is the client component of centralized identity management solutions such as FreeIPA, 389 Directory Server, Microsoft Active Directory, OpenLDAP and other directory servers. The client serves and caches the information stored in the remote directory server and provides identity, authentication and authorization services to the host machine.
+
+SSSD can connect to any LDAP server to lookup POSIX accounts and other information such as sudo rules and autofs maps using an SSSD LDAP provider. It also provides various mechanisms of access controls and password policies. LDAP provider features include (but they are not limited to):
+
+        SASL/SSL/TLS support
+
+        LDAP service auto discovery
+
+        Limit search behavior using multiple search bases
+
+        Password changing and password policy support
+
+        RFC2307 and RFC2307bis support
+
+        POSIX users and groups support
+
+        sudo rules support
+
+        autofs maps support
+
+        LDAP-based access control
+
+        Simple access control
+
 
 Configure SSSD for LDAP authentication
 
@@ -365,14 +427,14 @@ authentication:
         python-sssdconfig
         authconfig
         authconfig-gtk
-                
+
 
 Use your package manager to install these packages.
 
 2\. Check the current settings for sssd, if any:
 
         # authconfig --test
-                
+
 
 This will show you the current settings which are already in place. Also
 check for an existing `/etc/sssd/sssd.conf` file. On a fresh
@@ -394,7 +456,7 @@ sssd.conf file will not be present.
         --enablemkhomedir \
         --enablecachecreds \
         --update
-                
+
 
 4\. Check the configuration in `/etc/sssd/sssd.conf`.
 
@@ -405,12 +467,12 @@ certificates. Also change `ldap_id_use_start_tls` to "True".
 To effect the changes, run:
 
         # systemctl restart sssd
-                
+
 
 Verify that all changes are effective by running:
 
         # authconfig test
-                
+
 
 5\. Update `/etc/openldap/ldap.conf` to use the same ldap settings. Your
 `ldap.conf` file will look like this:
@@ -421,7 +483,7 @@ Verify that all changes are effective by running:
         TLS_REQUIRE never
         TLS_CACERTDIR /etc/pki/tls/cacerts
         TLS_CACERT /etc/pki/tls/certs/mybundle.pem
-                
+
 
 Please note that `TLS_REQUIRE` is set to never. This is done in order to
 avoid issues with application stacks like `PHP`, which have difficulties
