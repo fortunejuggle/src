@@ -58,14 +58,14 @@ initiated with `telnet`, `nc` or `ncat`: nc ncat telnet
         250-AUTH PLAIN LOGIN
         250-STARTTLS
         250 HELP
-            
+
 
 When using `nc` or `ncat` when performing the commands above, an
 additional `Enter` keystroke may be necessary. This is due to the
 differences in return characters that may exist between `telnet` and
 other, similar tools.
 
-With `telnet <smtp servername> 
+With `telnet <smtp servername>
             25` initial contact with the SMTP server is established. In
 the example above mx1.unix.nl was used as the server. The server
 responds with the maximum message size, the pipelining, and the
@@ -93,7 +93,7 @@ Since we have established the initial connection we can now proceed:
         250 OK
         rcpt to: nonexistent@unix.nl
         250 Accepted
-                
+
 
 The server responds with "250 OK" but when, for example, the "MAIL
 FROM:" command is followed by a misformatted or incomplete email address
@@ -118,7 +118,7 @@ We then proceed with the transmission:
         .
         250 OK id=1OjReS-0005kT-Jj
         quit
-            
+
 
 With the *DATA* command we proceed with the contents of the message. The
 server responds with: "354 Enter message, ending with \".\" on a line by
@@ -261,7 +261,7 @@ to use `makemap` to create or update it.
 To create a new access map:
 
         # makemap hash /etc/mail/access.db < /etc/mail/access
-                
+
 
 OK
 
@@ -306,7 +306,7 @@ virtusertable.
 To generate the virtusertable database map:
 
         # makemap hash /etc/mail/virtusertable < sourcefile
-                
+
 
 `/etc/mail/genericstable` - Used for outbound mail. Can be used to
 rewrite local usernames so they appear to have originated from a
@@ -316,7 +316,7 @@ different host or domain.
 `hostname --long` command.
 
         # hostname --long > genericsdomain
-                
+
 
 `/etc/mail/mailertable` - Used to route email from remote systems.
 
@@ -332,13 +332,13 @@ example use *ntp: root*. Now you can add a line to redirect all mail to
 marc*. `newaliases` needs to be run after any change to this file.
 
         # newaliases
-                
+
 
 If any update is made to one of the configuration files, sendmail needs
 to reload its' configuration:
 
         # killall -HUP sendmail
-                
+
 
 Antirelaying
 
@@ -356,7 +356,7 @@ Sendmail can be run in test mode. Use the `-b` and `-t` options to do
 this. You need to run this as root.
 
         # sendmail -bt
-                
+
 
 ###   Sendmail and DNS
 
@@ -364,7 +364,7 @@ Make sure that the MX records for the MTA's are available in DNS. This
 can be checked with: MX records
 
         $ dig MX somedomain.com
-                
+
 
 ###   Manual entries in sendmail.cf
 
@@ -453,13 +453,13 @@ that is more elaborate. The following line count operation gives an
 estimate about the differences between the different `main.cf` files on
 a Debian-based system:
 
-        user@debian:/usr/share/postfix$ wc -l /etc/postfix/main.cf 
+        user@debian:/usr/share/postfix$ wc -l /etc/postfix/main.cf
         43  /etc/postfix/main.cf
         user@debian:/usr/share/postfix$ wc -l /usr/share/postfix/main.cf*
         18  /usr/share/postfix/main.cf.debian
         665 /usr/share/postfix/main.cf.dist
          11 /usr/share/postfix/main.cf.tls
-                    
+
 
 The example above demonstrates that the
 `/usr/share/postfix/main.cf.dist` file holds more than 600 lines,
@@ -541,7 +541,7 @@ email adddresses as follows:
         550 5.1.1 <wodan>: Recipient address rejected: User unknown in local recipient table
         VRFY postfix
         252 2.0.0 postfix
-                    
+
 
 The 200-category response codes expose valid recipients. Just like HTTP
 servers do, a SMTP server can respond with status codes. It is
@@ -553,7 +553,7 @@ familiar. The VRFY command is enabled on Postfix by default. By enabling
 or adding the following line to `main.cf` the VRFY feature is disabled:
 
         disable_vrfy_command = yes
-                    
+
 
 Let's try the `VRFY root` command from above again after both having
 disabled the VRFY command and having reloaded Postfix:
@@ -578,7 +578,7 @@ disabled the VRFY command and having reloaded Postfix:
         502 5.5.1 VRFY command is disabled
         VRFY postfix
         502 5.5.1 VRFY command is disabled
-                    
+
 
 By disabling the possibility to distinguish between valid (2xx) and
 invalid (5xx) email recipients, the Internet has become a safer place.
@@ -629,7 +629,7 @@ is controlled by the *queue\_directory* configuration variable in de
 ####  Postfix preparations
 Before postfix can be used, it needs to know:
 
--   what domains to receive mail for 
+-   what domains to receive mail for
     ([mydestination](#mydestination))
 
 -   which domain name to use for outbound mail
@@ -651,7 +651,7 @@ defined as `$myhostname`. Changing the `myorigin` value to the
 configured domain name can be done as follows:
 
         myorigin = $mydomain
-                            
+
 
 The `$myhostname` or `$mydomain` are replaced by postfix with the
 hostname or domain of the server it is running on.
@@ -665,7 +665,7 @@ comma. Also, a pattern can be used to point to a lookup table (hash,
 btree, nis, ldap or mysql).
 
         mydestination = $mydomain, localhost.$mydomain, hash:/etc/postfix/moredomains
-                    
+
 
 **Note**
 You have to include `$mydomain` when the server is used as a mail server
@@ -678,10 +678,10 @@ to *authorized* destinations only. The `relay_domains` parameter
 controls for which domains postfix will accept and *forward* emails.
 
         relay_domains =     (safe: never forward mail from strangers)
-                        
+
 
         relay_domains = $mydomain (forward mail to my domain and subdomains)
-                        
+
 
 ####  relayhost
 
@@ -690,14 +690,14 @@ on the domain name of the destination address in the mail message. Using
 the `relayhost` parameter we can specify to use another SMTP server as
 relay:
 
-        relayhost = 
-                        
+        relayhost =
+
 
 This is the default, direct delivery to the internet, or using another
 ISP SMTP server:
 
         relayhost = mail.example.com
-                        
+
 
 ###   Logging
 
@@ -708,11 +708,11 @@ example below, redirected to the console.
 
         mail.err    /dev/console
         mail.debug  /var/log/maillog
-                
+
 
 #### pflogsumm
 
-Using `egrep '<reject|warning|error|fatal|panic>' 
+Using `egrep '<reject|warning|error|fatal|panic>'
                     /var/log/maillog` will help you to find any problems
 postfix encountered. There are also third party utilities like
 `pflogsumm` that can generate statistics out of Postfix logging.
@@ -730,12 +730,12 @@ virtual hosts using a space or a comma. Also a link to a (hashed) file
 on disk is possible:
 
         virtual_alias_domains = example.com, sue.nl, unix.nl
-                    
+
 
 postmap or when using a hashed file (using the `postmap` utility):
 
         virtual_alias_domains = hash:/etc/postfix/virtual
-                    
+
 
 The content of `/etc/postfix/virtual` can be:
 
@@ -743,7 +743,7 @@ The content of `/etc/postfix/virtual` can be:
         info@sue.nl     gerda
         sales@example.com   petra
         @example.com        jim
-                    
+
 
 In the above example peter receives the postmaster\@example.com email.
 Gerda receives the info\@sue.nl email and the sales\@example.com goes to
@@ -840,7 +840,7 @@ OpenSSL from encrypting the private key in the first place.
         sudo openssl req -nodes -x509 -newkey rsa:2048 \
         -keyout postfixkey.pem -out postfixcert.pem \
         -days 356
-                
+
 
 The *self-signed* certificate and private key created with the one-liner
 above can be used for postfix. Postfix demands the private key file is
@@ -850,7 +850,7 @@ following directives are used to refer to these files:
 
         smtpd_tls_cert_file=postfixcert.pem
         smtpd_tls_key_file=postfixkey.pem
-                
+
 
 **Note**
 smtpd\_tls smtp\_tls When declaring these directives, take special care
@@ -867,7 +867,7 @@ RSA counterparts:
 
         smtpd_tls_dcert_file=postfixcert.pem
         smtpd_tls_dkey_file=postfixkey.pem
-                
+
 
 ECDSA is another valid encryption algorithm for use with Postfix. But
 because many mailservers still use OpenSSL 0.9.8 versions that lack the
@@ -880,7 +880,7 @@ directives:
 
         smtpd_tls_eccert_file=postfixcert.pem
         smtpd_tls_eckey_file=postfixkey.pem
-                
+
 
 certificateself-signed CSR CA The OpenSSL example above creates a
 *self-signed* certificate. This is a way of getting the Postfix STARTTLS
@@ -952,7 +952,7 @@ upgrades over time.
         smtpd_tls_ciphers
         smtpd_tls_mandatory_ciphers
         smtpd_tls_exclude_ciphers
-                
+
 
 By disabling the `aNULL` ciphers, use of *anonymous* ciphers is
 prevented. The use of anonymous ciphers is one of the fall-back

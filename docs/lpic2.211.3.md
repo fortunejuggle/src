@@ -41,13 +41,13 @@ PAM service name.
 
 Here is an example of `/etc/pam.d/dovecot`:
 
-      
+
                                       #%PAM-1.0
 
                                       @include common-auth
                                       @include common-account
                                       @include common-session
-                    
+
 
 The method used by clients to send the login credentials to the server,
 is configured via the *mechanisms* parameter. The simplest
@@ -82,12 +82,12 @@ Using the *mail\_location* parameter in `10-mail.conf` we can configure
 which mailbox location we want to use:
 
         mail_location = maildir:~/Maildir
-                    
+
 
 or
 
         mail_location = mbox:~/mail:INBOX=/var/mail/%u
-                    
+
 
 In this case email is stored in `/var/mail/%u` where "%u" is converted
 into the username.
@@ -140,14 +140,14 @@ create self-signed SSL certificates:
     chmod 0600 $KEYFILE
     echo
     $OPENSSL x509 -subject -fingerprint -noout -in $CERTFILE || exit 2
-                    
+
 
 The important SSL configuration options can be found in the file:
 `10-ssl.conf`. To enable encryption of the data in transit between a
 client and a Dovecot server the following changes should be made.
 
         ssl = required
-        
+
 
 This configuration option requires that the client is using SSL/TLS as
 transport layer mechanism. Authentication attempts without SSL/TLS will
@@ -158,7 +158,7 @@ installation of Dovecot.
 
         ssl_cert = </etc/dovecot/dovecot.pem
         ssl_key = </etc/dovecot/private/dovecot.pem
-        
+
 
 The preferred permissions of the certificate is 0440 (world readable).
 The certificate is offered to clients. The permissions of the key should
@@ -170,7 +170,7 @@ vulnerable to multiple attacks like POODLE (Padding Oracle On Downgraded
 Legacy Encryption) those protocols should be disabled.
 
     ssl_min_protocol=TLSv1.2
-        
+
 
 Another key feature of configuring encryption is determine the cipher
 suite that should be used by Dovecot. The cipher suite defines the
@@ -181,7 +181,7 @@ is not possible to establish a secure connection. An example of a cipher
 suite is displayed below:
 
         ssl_cipher_list = AES256+EECDH:AES256+EDH
-        
+
 
 The cipher AES256+EECDH means that the cipher is using authenticated
 Ephemeral Elliptic Curve Diffie Hellman key agreement protocol. This
@@ -193,7 +193,7 @@ using elliptic curves but RSA algorithm. Another option that should be
 configured is:
 
         ssl_prefer_server_ciphers = yes
-        
+
 
 This option prefers the ciphers that are in the configured on the server
 in favour of the ciphers from the client. This configuration option
@@ -203,9 +203,9 @@ weak ciphers from the client. The attacker can attack the weak ciphers
 with main purpose to decrypt encrypted traffic. Another important
 configuration option is:
 
-        
+
         ssl_dh_parameters_length = 2048
-        
+
 
 This option configures Diffie-Hellman key exchange to 2048-bit keys.
 Recently the Logjam vulnerability was published. This attack is related
@@ -245,7 +245,7 @@ configured. The listeners can be configured in the file:
          }
         }
 
-        
+
 
 If the listener port is set to 0 the pop3 and imap service are not
 running on the server. Only the secure versions of the protocol are
@@ -259,7 +259,7 @@ listening on the appropriate port by using the command:
         tcp    0   0 0.0.0.0:995      0.0.0.0:*    LISTEN      3515/dovecot
         tcp6   0   0 :::993           :::*         LISTEN      3515/dovecot
         tcp6   0   0 :::995           :::*         LISTEN      3515/dovecot
-        
+
 
 As you can see pop3s and imaps are listening on their configured ports
 and ready to use.

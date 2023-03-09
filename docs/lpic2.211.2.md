@@ -52,7 +52,7 @@ file `main.cf` the *mailbox\_command* option should be configured to use
 the local delivery agent.
 
         mailbox_command = /usr/lib/dovecot/dovecot-lda -a "$RECIPIENT"
-                
+
 
 The next step is enabling sieve support in dovecot. In the configuration
 file `15-lda.conf` the following options should be configured:
@@ -64,7 +64,7 @@ file `15-lda.conf` the following options should be configured:
         protocol lda {
           mail_plugins = $mail_plugins sieve
         }
-                
+
 
 The configuration option: *lda\_mailbox\_autocreate* enables dovecot to
 create a mailbox if this action is initiated by a rule in sieve. The
@@ -80,7 +80,7 @@ adjustments:
             sieve_default = /var/lib/dovecot/sieve/default.sieve
             sieve_global_dir = /var/lib/dovecot/sieve
         }
-                
+
 
 The *sieve* configuration option is the location where users can save
 their sieve rules. The *sieve\_dir* configuration option is the
@@ -109,14 +109,14 @@ Example:
 
         /* This is multi
            line comment */
-                    
+
         # if -> control command
-        if <condition> { 
-           action1; 
+        if <condition> {
+           action1;
            action2;
            ...
            stop; #end processing
-                    
+
 
 ####  Control commands
 
@@ -137,15 +137,15 @@ processing of the script. Example:
         } else {
             fileinto "INBOX";
         }
-                
+
 
 Example:
 
-        if header :contains "subject" "money" { 
-           discard; 
-           stop; 
+        if header :contains "subject" "money" {
+           discard;
+           stop;
         }
-                
+
 
 ####  Test commands
 
@@ -164,7 +164,7 @@ evaluated. Example:
         if address :is "to" "john@doe.com" {
            fileinto "john";
         }
-                
+
 
 The `allof` command is a logical "AND" meaning all conditions should be
 evaluated to true for further action. Example:
@@ -173,7 +173,7 @@ evaluated to true for further action. Example:
         {
             fileinto "spam";
         }
-                
+
 
 The `anyof` command is a logical "OR" meaning ANY condition should be
 evaluated to true for further action. Example:
@@ -181,17 +181,17 @@ evaluated to true for further action. Example:
         if anyof (size :over 1M, header :contains "subject" "big file attached")
         {
             reject "I don't want messages that claim to have big files.";
-        }           
-                
+        }
+
 
 The `exists` command tests if a header exits with the message. All
 headers must return true for any action being executed. Example:
 
-        if exists "x-custom-header" 
+        if exists "x-custom-header"
         {
             redirect "admin@example.com";
         }
-                
+
 
 The `false` command simply returns false.
 
@@ -199,21 +199,21 @@ The `header` command tests if a header matches the condition set by the
 argument and evaluates to true. Example:
 
         if header :is ["subject"] "make money fast" {
-            discard; 
+            discard;
             stop;
         }
-                
+
 
 The `not` command should be used with another test. This command negates
 the other test for the action to be taken. The example below means that
 if the message does NOT contain "from" and "date" then the discard
 action will be taken. Example:
 
-        if not exists ["from", "date"] 
-        { 
-           discard; 
+        if not exists ["from", "date"]
+        {
+           discard;
         }
-                
+
 
 The `size` command is used to specify the message size to be higher or
 lower than a specified value in order to evaluate the condition to true.
@@ -224,7 +224,7 @@ letter for bytes. Example:
         if size :over 500K {
            discard;
         }
-                
+
 
 The `true` command simply returns true.
 
@@ -243,7 +243,7 @@ defined mailbox. Example:
         if attachment :matches ["*.vbs", "*.exe"] {
             fileinto "INBOX.suspicious";
         }
-                
+
 
 The `redirect` command redirects the message to the address that is
 specified in the argument without tampering the message. Example:
@@ -251,15 +251,15 @@ specified in the argument without tampering the message. Example:
         if exists "x-virus-found" {
             redirect "admin@example.com";
         }
-                
+
 
 The `discard` command causes the message silently deleted without
 sending any notification or any other message. Example:
 
-        if size :over 2M { 
-            discard; 
+        if size :over 2M {
+            discard;
         }
-                
+
 ### Sieve vacation extension
 Sieve also offers an auto-responder functionality by using the
 `vacation` extension. Below is an example shown that uses the `vacation`
@@ -278,7 +278,7 @@ extension.
         "I'm out of office, please contact Joan Doe instead.
         Best regards
         John Doe";
-                                    
+
 
 The `vacation` extension provides several options, namely:
 
@@ -310,7 +310,7 @@ Example:
         } else {
                vacation :handle "ran-away" "I'm out";
         }
-                    
+
 
 ##  Mbox and maildir storage formats
 
@@ -376,11 +376,11 @@ In mbox the format is:
         :0:
         recipe
         directory_name
-                
+
 
 While in maildir it would be:
 
         :0
         recipe
         directory_name/
-                
+
