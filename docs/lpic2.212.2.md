@@ -132,7 +132,7 @@ secure FTP server.
     # under  certain  conditions.  For  this  to  work,   the   option
     # write_enable  must be activated, and the anonymous ftp user must
     # have write permission on desired upload locations. This  setting
-    # is  also  required for virtual users to upload; by default, virtual 
+    # is  also  required for virtual users to upload; by default, virtual
     # users  are  treated   with   anonymous   (i.e.   maximally restricted) privilege.
     # Default: NO
     anon_upload_enable=YES
@@ -142,23 +142,23 @@ secure FTP server.
     # user may own files, especially in the presence of uploads.
     # Default: YES
     anon_world_readable_only=NO
-                    
+
 
 Create the ftp user:
 
         useradd --home /var/ftp --shell /bin/false ftp
-                    
+
 
 Create the FTP directory:
 
         mkdir -p --mode 733 /var/ftp/pub/incoming
-                    
+
 
 Set up inetd to listen for FTP traffic and start vsftpd. Add the
 following line to `/etc/inetd.conf`:
 
         ftp   stream    tcp   nowait   root   /usr/sbin/tcpd   /usr/sbin/vsftpd
-                    
+
 
 Reload the inetd daemon.
 
@@ -194,30 +194,30 @@ pure-ftpd If you want to listen for an incoming connection on a
 non-standard port, just append `-S` and the port number:
 
         /usr/local/sbin/pure-ftpd -S 42
-                
+
 
 If your system has many IP addresses and you want the FTP server to be
 reachable on only one of these addresses, let's say 192.168.0.42, just
 use the following command:
 
         /usr/local/sbin/pure-ftpd -S 192.168.0.42,21
-                
+
 
 **Note**
 
 The 21 port number could be left away since this is the default port.
 
-To limit the number of simultaneous connections use the `-c` option:
+To limit the number of simultaneous connections use the `-c` option and restict it to not more then 2 Clients `-C` per IP:
 
-        /usr/local/sbin/pure-ftpd -c 50 &
-                
+        /usr/local/sbin/pure-ftpd -c 50 -C 2 &
 
-####  Example minimal configuration for anonymous up- and downloads
+
+####  Example minimal configuration for anonymous only up- and downloads
 
 Create the ftp user:
 
         useradd --home /var/ftp --shell /bin/false ftp
-                    
+
 
 Create the ftp directory structure with the correct permissions:
 
@@ -226,7 +226,7 @@ Create the ftp directory structure with the correct permissions:
         mkdir -p --mode 555 /var/ftp/pub
         # Set the proper permissions to enable writing
         mkdir -p --mode 755 /var/ftp/pub/incoming
-                    
+
 
 Change ownership:
 
@@ -235,23 +235,22 @@ Change ownership:
         192552    0 dr-xr-xr-x   3 ftp      ftp            16 Mar 11 11:54 /var/ftp
         192588    0 dr-xr-xr-x   3 ftp      ftp             8 Mar 11 11:07 /var/ftp/pub
         192589    0 drwxr-xr-x   2 ftp      ftp             8 Mar 11 11:55 /var/ftp/pub/incoming
-                    
+
 
 Set up inetd to listen for FTP traffic and start `pure-ftpd`. Add the
 following line to `/etc/inetd.conf`:
 
         ftp   stream   tcp   nowait   root   /usr/sbin/tcpd   /usr/sbin/pure-ftpd -e
-                    
+
 
 Reload the inetd daemon:
 
         killall -HUP inetd
-                    
+
 
 or
 
         kill -HUP $(cat /var/run/inetd.pid)
-                    
 
 ###   Other FTP servers
 
@@ -266,7 +265,7 @@ server.
 
     SYNOPSIS
         proftpd [ -hlntv ] [ -c config-file ] [ -d debuglevel ] [ -p 0|1 ]
-                
+
 
 `proftpd` is the Professional File Transfer Protocol (FTP) server
 daemon. The server may be invoked by the Internet "super-server"
