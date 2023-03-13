@@ -85,7 +85,6 @@ private internets:
         10.0.0.0        -   10.255.255.255  (10/8 prefix)
         172.16.0.0      -   172.31.255.255  (172.16/12 prefix)
         192.168.0.0     -   192.168.255.255 (192.168/16 prefix)
-                
 
 We will refer to the first block as "24-bit block", the second as
 "20-bit block", and to the third as "16-bit" block. Note that when no
@@ -213,12 +212,19 @@ By default five chains (the netfilter hooks) and three tables are
 supported. As the figure below shows, certain chains are only valid for
 certain tables.
 
-| | |CHAIN| | | |
-|----|----|----|----|----|----|----|
-| | |PREROUTING|INPUT|FORWARD|OUTPUT|POSTROUTING|
-|TABLE|MANGLE|V| | |V| |
-| |NAT|V| | |V|V|
-| |FILTER| |V|V|V| |
+
+| CHAINS                                               |
+|------------------------------------------------------|
+|      INPUT OUTPUT FORWARD PREROUTING POSTROUTING     |
+
+***
+
+| Table  |                 CHAINS                      |
+|--------|---------------------------------------------|
+| FILTER | INPUT OUTPUT FORWARD                        |
+| NAT    | PREROUTING POSTROUTING OUTPUT               |
+| MANGLE | INPUT OUTPUT FORWARD PREROUTING POSTROUTING |
+
 
 ###   The *FILTER* table
 
@@ -312,7 +318,7 @@ QUEUE
 
 -   Pass the packet to user space. iptablesQUEUE
 
-RETURN``
+RETURN
 
 -   Stop traversing this chain and resume at the next rule in the
     previous calling chain. If the end of a built-in chain is reached or
@@ -570,7 +576,7 @@ set the default policy using the `-P` option.
         iptables -t filter -L
         iptables -t filter -F INPUT
         iptables -t filter -P INPUT DROP
-                    
+
 
 REJECT is not possible as a default policy. If you still want REJECT as
 an (implied) last rule then add a REJECT rule yourself as the last rule
@@ -744,15 +750,15 @@ ICMP protocol and message type 8 (echo-request)). The Firewall
 communicates with the Internet through interface eth1. Taking all this
 into consideration, the `iptables` commands needed are:
 
-        iptables -t filter -A OUTPUT -o eth1 -p udp  --destination-port dns        \
-        -m state --state NEW -j ACCEPT  
-        iptables -t filter -A OUTPUT -o eth1 -p tcp  --destination-port ssh        \
+        iptables -t filter -A OUTPUT -o eth1 -p udp  --destination-port dns
         -m state --state NEW -j ACCEPT
-        iptables -t filter -A OUTPUT -o eth1 -p tcp  --destination-port 2064       \
+        iptables -t filter -A OUTPUT -o eth1 -p tcp  --destination-port ssh
         -m state --state NEW -j ACCEPT
-        iptables -t filter -A OUTPUT -o eth1 -p icmp --icmp-type echo-request      \
+        iptables -t filter -A OUTPUT -o eth1 -p tcp  --destination-port 2064
         -m state --state NEW -j ACCEPT
-                    
+        iptables -t filter -A OUTPUT -o eth1 -p icmp --icmp-type echo-request
+        -m state --state NEW -j ACCEPT
+
 
 These four `iptables` commands tell the firewall to allow outgoing
 connection-initialization packets for DNS, SSH, TCP/2064 and ping.
@@ -763,9 +769,9 @@ We want to be able to use `ssh`, which uses the TCP protocol and port
 22, to connect to our Firewall from other systems on the Internet. The
 `iptables` command needed is:
 
-        iptables -t filter -A INPUT  -i eth1 -p tcp --destination-port ssh         \
+        iptables -t filter -A INPUT  -i eth1 -p tcp --destination-port ssh
         -m state --state NEW -j ACCEPT
-                    
+
 
 This `iptables` command tells the firewall to allow incoming connection
 initialization packets for SSH.
@@ -776,9 +782,9 @@ We want to be able to use `ssh`, which uses the TCP protocol and port
 22, to connect to one of our internal machines from our Firewall. The
 `iptables` command needed is:
 
-        iptables -t filter -A OUTPUT -o eth0 -p tcp --destination-port ssh         \
+        iptables -t filter -A OUTPUT -o eth0 -p tcp --destination-port ssh
         -m state --state NEW -j ACCEPT
-                    
+
 
 This `iptables` command tells the Firewall to allow outgoing SSH
 connection initialization packets destined for a machine on the internal
@@ -792,15 +798,15 @@ keys, must be able to talk to the proxy on the firewall using port 2064
 and must be able to ping the firewall for system administrative
 purposes. The `iptables` commands needed are:
 
-        iptables -t filter -A INPUT  -i eth0 -p udp --destination-port dns         \
+        iptables -t filter -A INPUT  -i eth0 -p udp --destination-port dns
         -m state --state NEW -j ACCEPT
-        iptables -t filter -A INPUT  -i eth0 -p tcp --destination-port ssh         \
+        iptables -t filter -A INPUT  -i eth0 -p tcp --destination-port ssh
         -m state --state NEW -j ACCEPT
-        iptables -t filter -A INPUT  -i eth0 -p tcp --destination-port 2064        \
+        iptables -t filter -A INPUT  -i eth0 -p tcp --destination-port 2064
         -m state --state NEW -j ACCEPT
-        iptables -t filter -A INPUT  -i eth0 -p icmp --icmp-type echo-request      \
+        iptables -t filter -A INPUT  -i eth0 -p icmp --icmp-type echo-request
         -m state --state NEW -j ACCEPT
-                    
+
 
 These four `iptables` commands tell the firewall to allow incoming
 connection-initialization packets for DNS, SSH, RC564 cracking and ping.
@@ -812,7 +818,7 @@ the Internet is allowed. The `iptables` command needed is:
 
         iptables -t filter -A FORWARD -i eth0 -o eth1 -m state --state NEW -j ACCEPT
         iptables -t nat -A POSTROUTING -o eth1 -j SNAT --to-source 101.102.103.104
-                    
+
 
 This `iptables` command tells the firewall to allow ALL outgoing
 connection initialization packets.
@@ -836,11 +842,9 @@ The solution here is to tell Machine 4 that all data from the Internet
 that is aimed at port 80 should be routed to port 2345 on Machine 2. The
 `iptables` commands needed are:
 
-        iptables -t nat -A PREROUTING -i eth1 -p tcp --destination-port 80         \
-        -j DNAT --to-destination 192.168.0.11:2345
-        iptables -t filter -A FORWARD -i eth1 -p tcp --destination-port 2345       \
-        -m state --state NEW -j ACCEPT
-                    
+     iptables -t nat -A PREROUTING -i eth1 -p tcp --destination-port 80 -j DNAT --to-destination 192.168.0.11:2345
+     iptables -t filter -A FORWARD -i eth1 -p tcp --destination-port 2345 -m state --state NEW -j ACCEPT
+
 
 The first line changes the destination address and port. Since this then
 becomes traffic aimed at another machine, the traffic must pass the
@@ -863,7 +867,7 @@ following `iptables` commands to realize this:
         iptables -t filter -A FORWARD -m state --state ESTABLISHED,RELATED -j ACCEPT
         iptables -t filter -A OUTPUT  -m state --state ESTABLISHED,RELATED -j ACCEPT
         iptables -t filter -A INPUT   -m state --state NEW -i lo           -j ACCEPT
-                    
+
 
 Remember that these last rules can't cause a security problem because
 the packets allowed are a result of the fact that we've accepted the
@@ -901,77 +905,59 @@ be accomplished with the following commands:
     #     DNS, SSH, RC564, PING
     ###############################################################################
     # ALLOW INITIATION BY THE FIREWALL
-    iptables -t filter -A OUTPUT -o eth1 -p udp  --destination-port dns        \
-    -m state --state NEW -j ACCEPT
-    iptables -t filter -A OUTPUT -o eth1 -p tcp  --destination-port ssh        \
-    -m state --state NEW -j ACCEPT
-    iptables -t filter -A OUTPUT -o eth1 -p tcp  --destination-port 2064       \
-    -m state --state NEW -j ACCEPT
-    iptables -t filter -A OUTPUT -o eth1 -p icmp --icmp-type echo-request      \
-    -m state --state NEW -j ACCEPT
-    # ALLOW INCOMING RESPONSES 
-    iptables -t filter -A INPUT  -i eth1                                       \
-    -m state --state ESTABLISHED,RELATED -j ACCEPT
+    iptables -t filter -A OUTPUT -o eth1 -p udp  --destination-port dns -m state --state NEW -j ACCEPT
+    iptables -t filter -A OUTPUT -o eth1 -p tcp  --destination-port ssh -m state --state NEW -j ACCEPT
+    iptables -t filter -A OUTPUT -o eth1 -p tcp  --destination-port 2064 -m state --state NEW -j ACCEPT
+    iptables -t filter -A OUTPUT -o eth1 -p icmp --icmp-type echo-request -m state --state NEW -j ACCEPT
+    # ALLOW INCOMING RESPONSES
+    iptables -t filter -A INPUT  -i eth1 -m state --state ESTABLISHED,RELATED -j ACCEPT
 
     ###############################################################################
     # (2) TRAFFIC INITIATED FROM THE INTERNET AND DESTINED FOR THE FIREWALL
     #     SSH
     ###############################################################################
     # ALLOW INITIATION
-    iptables -t filter -A INPUT  -i eth1 -p tcp  --destination-port ssh        \
-    -m state --state NEW -j ACCEPT
+    iptables -t filter -A INPUT  -i eth1 -p tcp  --destination-port ssh -m state --state NEW -j ACCEPT
     # ALLOW RESPONSE
-    iptables -t filter -A OUTPUT -o eth1 -p tcp  --destination-port ssh                     \
-    -m state --state ESTABLISHED,RELATED -j ACCEPT
+    iptables -t filter -A OUTPUT -o eth1 -p tcp  --destination-port ssh -m state --state ESTABLISHED,RELATED -j ACCEPT
 
     ###############################################################################
     # (3) TRAFFIC INITIATED BY THE FIREWALL AND DESTINED FOR THE INTERNAL NETWORK
     #     SSH
     ###############################################################################
     # ALLOW INITIATION
-    iptables -t filter -A OUTPUT -o eth0 -p tcp  --destination-port ssh        \
-    -m state --state NEW -j ACCEPT
+    iptables -t filter -A OUTPUT -o eth0 -p tcp  --destination-port ssh -m state --state NEW -j ACCEPT
     # ALLOW RESPONSE
-    iptables -t filter -A INPUT  -i eth0 -p tcp  --destination-port ssh        \
-    -m state --state ESTABLISHED,RELATED -j ACCEPT
+    iptables -t filter -A INPUT  -i eth0 -p tcp  --destination-port ssh-m state --state ESTABLISHED,RELATED -j ACCEPT
 
     ###############################################################################
     # (4) TRAFFIC INITIATED BY THE INTERNAL NETWORK AND DESTINED FOR THE FIREWALL
     #     DNS, SSH, RC564, PING
     ###############################################################################
     # ALLOW INITIATION
-    iptables -t filter -A INPUT  -i eth0 -p udp  --destination-port dns        \
-    -m state --state NEW -j ACCEPT
-    iptables -t filter -A INPUT  -i eth0 -p tcp  --destination-port ssh        \
-    -m state --state NEW -j ACCEPT
-    iptables -t filter -A INPUT  -i eth0 -p tcp  --destination-port 2064       \
-    -m state --state NEW -j ACCEPT
-    iptables -t filter -A INPUT  -i eth0 -p icmp --icmp-type echo-request      \
-    -m state --state NEW -j ACCEPT
-    # ALLOW RESPONSE 
-    iptables -t filter -A OUTPUT -o eth0                                       \
-    -m state --state ESTABLISHED,RELATED -j ACCEPT
+    iptables -t filter -A INPUT  -i eth0 -p udp  --destination-port dns -m state --state NEW -j ACCEPT
+    iptables -t filter -A INPUT  -i eth0 -p tcp  --destination-port ssh -m state --state NEW -j ACCEPT
+    iptables -t filter -A INPUT  -i eth0 -p tcp  --destination-port 2064 -m state --state NEW -j ACCEPT
+    iptables -t filter -A INPUT  -i eth0 -p icmp --icmp-type echo-request -m state --state NEW -j ACCEPT
+    # ALLOW RESPONSE
+    iptables -t filter -A OUTPUT -o eth0 -m state --state ESTABLISHED,RELATED -j ACCEPT
 
     ###############################################################################
     # (5) TRAFFIC INITIATED BY THE INTERNAL NETWORK AND DESTINED FOR THE OUTSIDE
     #     EVERYTHING WE CAN INITIATE IS ALLOWED
     ###############################################################################
     # ALLOW INITIATION OF EVERYTHING
-    iptables -t filter -A FORWARD -i eth0 -o eth1                              \
-    -m state --state NEW -j ACCEPT
+    iptables -t filter -A FORWARD -i eth0 -o eth1 -m state --state NEW -j ACCEPT
     # ALLOW RECEPTION
-    iptables -t filter -A FORWARD -i eth1 -o eth0                              \
-    -m state --state ESTABLISHED,RELATED -j ACCEPT
+    iptables -t filter -A FORWARD -i eth1 -o eth0 -m state --state ESTABLISHED,RELATED -j ACCEPT
 
     ###############################################################################
     # (6) TRAFFIC INITIATED FROM THE INTERNET AND DESTINED FOR THE INTERNAL NETWORK
     #     ALL FORBIDDEN, EXCEPT WEBSERVER FORWARDING TO INTERNAL MACHINE
     ###############################################################################
     # ALLOW DESTINATION NAT FROM FIREWALL:80 TO INTERNAL MACHINE:2345
-    iptables -t nat -A PREROUTING -i eth1 -p tcp --destination-port 80         \
-    -j DNAT --to-destination 192.168.0.11:2345
-    iptables -t filter -A FORWARD -i eth1 -p tcp --destination-port 2345       \
-    -m state --state NEW -j ACCEPT
+    iptables -t nat -A PREROUTING -i eth1 -p tcp --destination-port 80 -j DNAT --to-destination 192.168.0.11:2345
+    iptables -t filter -A FORWARD -i eth1 -p tcp --destination-port 2345 -m state --state NEW -j ACCEPT
 
     ###############################################################################
     # (!) TRAFFIC AS A RESULT OF INITIATED TRAFFIC
@@ -990,10 +976,18 @@ be accomplished with the following commands:
     iptables -t nat    -A POSTROUTING -o eth1 -j SNAT --to-source 101.102.103.104
 
     ###############################################################################
-    # ENABLE FORWARDING
+    # ENABLE FORWARDING IPv4
     ###############################################################################
     echo 1 > /proc/sys/net/ipv4/ip_forward
-                    
+    # or even better to make it persistent
+    echo "net.ipv4.ip_forward = 1" >> /etc/sysctl.conf
+
+    ###############################################################################
+    # ENABLE FORWARDING IPv6
+    ###############################################################################
+    echo 1 > /proc/sys/net/ipv6/conf/all/forwarding
+    # or even better to make it persistent
+    echo "net.ipv6.conf.all.forwarding = 1" >> /etc/sysctl.conf
 
 ####  Saving And Restoring Firewall Rules
 
@@ -1005,7 +999,7 @@ save and/or restore the rules, the two commands are:
 
         iptables-save > fwrules.saved
         iptables-restore < fwrules.saved
-                
+
 
 These commands can be used to initialize a firewall/routing machine at
 boottime by putting them into a SysV startup script.
@@ -1207,7 +1201,7 @@ SYNOPSIS (most important opions):
         route
         route [-v] add [-net|-host] target [netmask NM] [gw GW] [metric N] [[dev] If]
         route [-v] del [-net|-host] target [netmask NM] [gw GW] [metric N] [[dev] If]
-                    
+
 
 `route` itself, without any parameters, displays the routing table. The
 `-ee` option will generate a very long line with all paramaters from the
@@ -1247,7 +1241,7 @@ Examples:
         route add -net 192.168.10.0 netmask 255.255.255.0 dev eth0
         route add -net 192.168.20.0 netmask 255.255.255.0 gw 192.168.1.10
         route add default gw 192.168.1.1 eth1
-                    
+
 
 The output of the kernel routing table is organized in the following
 columns:
@@ -1291,7 +1285,7 @@ Example:
         192.168.20.0    *               255.255.255.0   U     0      0        0 eth0
         link-local      *               255.255.0.0     U     1002   0        0 eth0
         default         192.168.20.1    0.0.0.0         UG    0      0        0 eth0
-                    
+
 
 ##  `netstat`
 
@@ -1307,7 +1301,7 @@ following:
         192.168.20.0    0.0.0.0         255.255.255.0   U         0 0          0 eth0
         169.254.0.0     0.0.0.0         255.255.0.0     U         0 0          0 eth0
         0.0.0.0         192.168.20.1    0.0.0.0         UG        0 0          0 eth0
-                    
+
 
 `netstat -rn` will show also the routing table. The `-r` option will
 show the routing table where the `-n` will prevent resolving IP
@@ -1324,7 +1318,7 @@ The following example allows ICMPv6:
 
         ip6tables -A INPUT -p icmpv6 -j ACCEPT
         ip6tables -A OUTPUT -p icmpv6 -j ACCEPT
-            
+
 
 Iptables and ip6tables may be used simultanously. Refer to the
 `iptables(8)` manpage for detailed information.
