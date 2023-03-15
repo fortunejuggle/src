@@ -103,14 +103,13 @@ possible, select SSH protocol version 2 as the only one to use.
 
 `ssh` implements the RSA authentication mechanism sshUser Keys
 automatically. The user creates an RSA key pair by running `ssh-keygen`.
-This stores the private key in ssh-keygen `$HOME/.ssh/id_rsa` and the
-public key in sshid\_rsa sshid\_rsa.pub `$HOME/.ssh/id_rsa.pub` in the
-user's home directory. The user should then copy the id\_rsa.pub into
-the `$HOME/.ssh/authorized_keys` file in his home sshauthorized\_keys
-directory on the remote machine:
+This stores the private key in `$HOME/.ssh/id_rsa` and the
+public key in `$HOME/.ssh/id_rsa.pub` in the user's home directory.
+The user should then copy the `$HOME/.ssh/id_rsa.pub` into
+the `$HOME/.ssh/authorized_keys` file on the remote machine:
 
-        # cat id_rsa.pub >> ˜/.ssh/authorized_keys
-                    
+        cat id_rsa.pub | ssh <user>@<server> 'cat >> ~/.ssh/authorized_keys'
+
 
 The `authorized_keys file` has only one key per line which can be very
 long. After this, the user can log in without giving the password.
@@ -424,7 +423,7 @@ to login without having to type your password each time:
 
         eval `ssh-agent`
         ssh-add
-                    
+
 
 The `` eval `ssh-agent` `` sets a number of environment variables. In
 fact, `ssh-agent` returns the strings needed to set them and `eval` sees
@@ -441,7 +440,7 @@ following line to your `.bash_logout` file or equivalent, depending on
 the shell you are using:
 
         ssh-agent -k
-                    
+
 
 The process id of of the current agent is determined by examining the
 contents of the environment variable \$SSH\_AGENT\_PID, which has been
@@ -471,7 +470,7 @@ local to remote, but also remote to local.
 The syntax is:
 
         ssh -R|L [bind_address:]port:host:host_port [user@]hostname [command]
-                    
+
 
 ###   Example
 
@@ -480,7 +479,7 @@ We are working on MyMachine, and we want to connect to the mysql server
 on Machine 1. The firewall doesn't allow sql connections. The firewall
 has port forwarding configured so that incoming traffic on port 22 from
 the internet will be forwarded to port 22 on Machine1. John is an user
-on Machine1. 
+on Machine1.
 
 ![](images/212-SSHPFW.dot.svg.jpg)
 
@@ -488,13 +487,13 @@ First open the tunnel by running `ssh` with the \"-L\"
 option:
 
         MyMachine# ssh -L 13306:localhost:3306 john@101.102.103.104
-                    
+
 
 Then run your application, connecting to the local port that is
 forwarded by the SSH tunnel:
 
         MyMachine# mysql -P 13306
-                    
+
 
 You are now connected to the remote MySQL server without the need to
 enable SQL connections over the network.
@@ -504,7 +503,7 @@ wants/needs to initialize the SSH connection to enable the remote party
 to connect back through the tunnel. In this simplified example an ssh
 tunnel is started on Machine1 to machine2 with the `-R`. Then the sql
 client on machine2 can connect on localhost:13306 and gets a connection
-with the mysql server on port 3306 through the SSH tunnel. 
+with the mysql server on port 3306 through the SSH tunnel.
 
 
 ![](images/212-SSHRPFW.dot.svg.jpg)

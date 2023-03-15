@@ -93,7 +93,7 @@ will be useful to see the actual results:
         nc: connect to localhost port 83 (tcp) failed: Connection refused
         nc: connect to localhost port 84 (tcp) failed: Connection refused
         nc: connect to localhost port 85 (tcp) failed: Connection refused
-                    
+
 
 The man page of netcat shows some more examples on how to use netcat.
 
@@ -165,7 +165,7 @@ portscan against our localhost:
         389/tcp  open  ldap
 
         Nmap done: 1 IP address (1 host up) scanned in 0.20 seconds
-                    
+
 
 **Note**
 By default, `nmap` will only scan the 1000 most common ports. Use the
@@ -176,10 +176,10 @@ Let's perform the same scan, using the UDP protocol:
         $ nmap -sU localhost
         You requested a scan type which requires root privileges.
         QUITTING!
-                
+
 
 Nmap is a very powerful network scanner, but some options require root
-privileges. If you would perform the command `nmap 
+privileges. If you would perform the command `nmap
                 localhost` both as root and using your own privileges,
 nmap would use the `-sS` option as root and the `-sT` when run with
 normal user privileges.
@@ -198,7 +198,7 @@ Now, let's run the UDP scan again using root privileges trough sudo:
     2049/udp open  nfs
 
     Nmap done: 1 IP address (1 host up) scanned in 1.62 seconds
-                    
+
 
 Nmap is a very versatile and powerful tool, and offers a variety of
 options regarding its capabilities. Nmap can, for example, be used for
@@ -236,7 +236,7 @@ administrator rights to do this:
 
     Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
     Nmap done: 1 IP address (1 host up) scanned in 18.04 seconds
-                    
+
 
 As you can tell from the output, the tested machine was the machine
 which host this website.
@@ -259,7 +259,7 @@ Detailed information about OpenVAS can be found at: [Openvas - Open
 vulnerability assessment system community
 site](http://www.openvas.org/index.html).
 
-##  The Snort IDS (Intrusion Detection System) 
+##  The Snort IDS (Intrusion Detection System)
 
 Snort Snort is an open source network intrusion detection system (NIDS)
 capable of performing real-time traffic analysis and packet logging on
@@ -327,12 +327,12 @@ Just some examples:
         alert udp any 1024:2048 -> any any (msg: "UDP ports";)
         alert tcp 192.168.2.0/24 23 <> any any (content: "confidential"; msg: "Detected confidential";)
         log udp any !53 -> any any log udp
-                    
+
 
 Detailed information about Snort can be found at: [Snort
 IDS](https://www.snort.org).
 
-##  Intrusion Detection and Prevention Systems 
+##  Intrusion Detection and Prevention Systems
 
 When talking about Intrusion Detection Systems (IDS), we can make a
 distinction between Host Intrusion Detection Systems (HIDS) and Network
@@ -512,7 +512,7 @@ running on port 25:
         QUIT
         221 linux.mailserver closing connection
         Connection closed by foreign host.
-                    
+
 
 The message is accepted because the mailserver is configured to accept
 connections that origin from the local host, and because

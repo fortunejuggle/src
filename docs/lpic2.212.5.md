@@ -95,7 +95,7 @@ endpoints will be encrypted and occur over the default OpenVPN port
 1194.
 
 openvpn To setup this example a key has to be created:
-`openvpn --genkey 
+`openvpn --genkey
                     --secret static.key`. Copy this key (`static.key`)
 to both client and server.
 
@@ -108,19 +108,26 @@ Server configuration file (server.conf):
         persist-tun
         persist-key
         secret static.key
-                        
+
 
 Client configuration file (client.conf):
 
+        client
         remote vpnserver.example.com
-        dev tun 
+        dev tun
         ifconfig 10.10.10.11 10.10.10.10
         keepalive 10 60
         ping-timer-rem
         persist-tun
         persist-key
         secret static.key
-                        
+
 
 Start the vpn on the server by running `openvpn server.conf` and running
 `openvpn client.conf` on the client.
+
+There are other useful options for example you can `push "route 192.168.10.0 255.255.255.0"` routes to clients or you can allow clients to be able to see each other `client-to-client`.
+
+If you are not able to install and test OpenVPN yourself, you can find everything you need to know on [GitHub]
+(https://github.com/OpenVPN/openvpn/tree/master/sample/sample-config-files)
+
