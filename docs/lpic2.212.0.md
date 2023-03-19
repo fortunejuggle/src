@@ -37,7 +37,8 @@ Candidates should be able to configure a VPN (Virtual Private
     Network) and create secure point-to-point or site-to-site
     connections.
 
-Sources of information: <https://openvpn.net>,
+Sources of information:
+[OpenVPN](https://openvpn.net),
 [IPTables](https://wiki.archlinux.org/index.php/iptables),
 [OpenSSH](http://www.openssh.com/),
 [FTP](http://slacksite.com/other/ftp.html)
