@@ -32,7 +32,7 @@ monitoring e-mail servers.
 
 Since October 2008, RFC 5321 is used to describe the SMTPprotocol.
 
-When an SMTPclienthas a message to transmit, it establishes a two-way
+When an SMTP client has a message to transmit, it establishes a two-way
 transmission channel to an SMTPserver. The responsibility of the client
 is to transfer the message to one or more SMTP servers, or to report a
 failure to do so.
@@ -45,7 +45,7 @@ Detailed information can be found
 at:[RFC5321](https://www.ietf.org/rfc/rfc5321.txt).
 
 For demonstration and testing purposes a plain text SMTP session can be
-initiated with `telnet`, `nc` or `ncat`: nc ncat telnet
+initiated with `telnet`, `nc` or `ncat`.
 
         telnet mx1.unix.nl 25
         Connected to mx1.unix.nl (213.154.248.146).
@@ -144,6 +144,8 @@ often use not so regular SMTP clients and hence could send malformed
 messages.
 
 ##  Sendmail
+
+SendMail is a simple program that can send e-mails via SMTP protocol.
 
 Basic sendmail configuration steps are: sendmail
 
@@ -342,8 +344,6 @@ to reload its' configuration:
 
 Antirelaying
 
-antirelaying
-
 Starting with version 8.9, sendmail does not relay by default. When
 using an older sendmail version, make changes to the `sendmail.cf` or
 `access` files to make sure that it does not relay. Antirelaying tips
@@ -386,7 +386,7 @@ configuration help, FAQ, etc.
 
 ##  Postfix
 
-Postfix is another, widely adopted, MTA. It focusses on speed, ease of
+Postfix is another, widely adopted, **M**ail **D**elivery **A**gent. It focusses on speed, ease of
 administration and security. The author of the software, Wietse Venema,
 was dependant on long computer calculations during his study. It was
 during that time that he developed a habit of creating software that
@@ -756,9 +756,7 @@ Use `postmap /etc/postfix/virtual` to create the hashed file and issue a
 
 Sendmail emulation layer commands
 
-mailq
-
-newaliases Since Sendmail has been the de facto mail delivery standard
+Since Sendmail has been the de facto mail delivery standard
 on Unix-like systems for years, replacements like Postfix have felt
 compelled to implement sendmail emulation layer commands in order to
 maintain compatibility with outside programs. That is to say that
@@ -804,13 +802,11 @@ Unlike Apache, we leave out the SSL acronym and only refer to TLS for
 Postfix. The following paragraphs will explain more about TLS-specific
 Postfix directives and about configuring Postfix for use with TLS.
 
-At the time of writing, TLSv1.3 is the latest TLS version. TLSv1.3 has
-reached DRAFT status, and it will be a matter of time before it hits the
-streets. There will be some noteworthy changes between TLSv1.2 and
-TLSv1.3. Up to TLSv1.2, a ciphersuite consisted of an authentication
-algorithm, an encryption algorithm, a message digest algorithm and a key
-exchange algorithm. These four algorithms work together and are defined
-by their acronyms. From TLSv1.3 onward, the ciphersuite will consist of
+TLSv1.3 is the latest TLS version. There will be some noteworthy changes
+between TLSv1.2 and TLSv1.3. Up to TLSv1.2, a ciphersuite consisted of an
+authentication algorithm, an encryption algorithm, a message digest algorithm
+and a key exchange algorithm. These four algorithms work together and
+are defined by their acronyms. From TLSv1.3 onward, the ciphersuite will consist of
 only the encryption and message authentication algorithm.
 
 The following paragraphs are ment to assist you in getting Postfix with
@@ -859,14 +855,7 @@ directives. The latter are used for client authentication.
 
 The certificate file must be in the PEM-format. This is the OpenSSL
 standard export format, so no additional flags should be required. In
-the example above, the RSA algorithm is used. Instead of RSA, DSA could
-also be used as the encryption algorithm. When using the DSA algorithm,
-the key needs to be generated using the `-t dsa` option and the
-directives for the certificate file and key slightly differ from their
-RSA counterparts:
-
-        smtpd_tls_dcert_file=postfixcert.pem
-        smtpd_tls_dkey_file=postfixkey.pem
+the example above, the RSA algorithm is used.
 
 
 ECDSA is another valid encryption algorithm for use with Postfix. But
@@ -880,6 +869,16 @@ directives:
 
         smtpd_tls_eccert_file=postfixcert.pem
         smtpd_tls_eckey_file=postfixkey.pem
+
+
+Even if the key is stored in the same file as the certificate, the file is read twice.
+This is fixed in newer postfix versions with all-in-one chain file(s).
+Single file can hold multiple (key, cert, [chain]) sequences, one per algorithm. It is typically simpler to keep the chain for each algorithm in its own file. Most users are likely to deploy just a single key.
+        smtpd_tls_chain_files =
+                /etc/postfix/rsa.pem,
+                /etc/postfix/ecdsa.pem,
+                /etc/postfix/ed25519.pem,
+                /etc/postfix/ed448.pem
 
 
 certificateself-signed CSR CA The OpenSSL example above creates a
