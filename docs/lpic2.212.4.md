@@ -387,12 +387,6 @@ discussion and announcement of computer security vulnerabilities: what
 they are, how to exploit them and how to fix security vulnerabilities
 them.
 
-####  Bugtraq website
-
-The [SecurityFocus](http://www.securityfocus.com) website brings
-together many different resources related to security. One of them is
-the securityfocus Bugtraq mailing list. There also is a Bugtraq FAQ.
-
 ####  How to subscribe to Bugtraq
 
 Use the webform at <http://www.securityfocus.com/> to subscribe to any
@@ -487,7 +481,7 @@ anti-spam blacklists. blacklisting
 
 ###   Testing for open mail relaying
 
-open relay how to testTesting a mail relay can be done by delivering an
+Testing a mail relay can be done by delivering an
 email for a recipient to a server that's not supposed to do any
 relaying for the recipients domain. If the server accepts AND delivers
 the email it is an open relay.
