@@ -637,6 +637,7 @@ The required parameters for generating a key:
 a *algorithm* (`-a` option)
 
 -   RSA \| RSAMD5 \| DH \| DSA \| RSASHA1 \| HMAC-MD5
+    - do not use RSAMD5 and RSASHA1. It is not secure.
 
 a *key size* (`-b` option)
 
@@ -659,6 +660,19 @@ a *nametype* (`-n` option)
 As an example, say we typed this command:
 
         $ dnssec-keygen -a DSA -b 768 -n ZONE example.com.
+
+
+##### Out of LPIC 2 Scope
+
+At newer systems use a more secure algorithm and longer bits to generate key files.
+
+The commands will be as follows:
+
+`cat /proc/sys/kernel/random/entropy_avail`
+
+If the entropy count is >=256 you are good to go.
+
+`dnssec-keygen`-a RSASHA256 -b 2048 -n ZONE example.com
 
 
 After completion there will be two files, which have names similar to
@@ -728,7 +742,7 @@ IP address `224.123.400.2` and want to allow access for a server with IP
 address `224.123.400.1` we may use:
 
         server 224.123.400.1 {
-            keys key.example.com.;
+            keys { key.example.com. ; };
         };
 
 
