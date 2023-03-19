@@ -203,7 +203,7 @@ existing entries. If invoked as `ldapadd`, this option is always set.
         ldapadd -h myhost -p 389 -D "cn=orcladmin" -w welcome -f jhay.ldif
 
 
-Using this command, user orcladmin authenticates to the directory
+Using this command, user orcladmin authenticates to the directory at
 myhost, located at port 389. The command then opens the file jhay.ldif
 and adds its contents to the directory. The file might, for example, add
 the entry "uid=jhay,cn=Human Resources,cn=example,dc=com" and its object
@@ -227,7 +227,7 @@ with those Distinguished Names are deleted.
         "uid=hricard,ou=sales,ou=people,dc=example,dc=com"
 
 
-This command authenticates user orcladmin to the directory myhost, using
+This command authenticates user orcladmin to the directory at myhost, using
 the password welcome. Then it deletes the entry
 "uid=hricard,ou=sales,ou=people,dc=example,dc=com".
 
