@@ -276,6 +276,8 @@ may be used and the levels are additive.
 
 Available levels are:
 
+       -1      any enable all debugging
+        0      no debugging
         1      (0x1 trace) trace function calls
         2      (0x2 packets) debug packet handling
         4      (0x4 args) heavy trace debugging (function args)
