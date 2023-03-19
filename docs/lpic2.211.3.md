@@ -3,9 +3,31 @@
 Candidates should be aware of Courier email server and be able to
 install and configure POP and IMAP daemon on a Dovecot server.
 
+
+### Key Knowledge Areas:
+
+-    Dovecot IMAP and POP3 configuration and administration
+
+-    Basic TLS configuration for Dovecot
+
+-    Awareness of Courier
+
+
+### The following is a partial list of the used files, terms and utilities:
+
+-    `/etc/dovecot/`
+
+-    `dovecot.conf`
+
+-    `doveconf`
+
+-    `doveadm`
+
+
+
 ##  Courier
 
-The Courier mail transfer agent (MTA) is an integrated mail/groupware
+The Courier **M**ail **T**ransfer **A**gent is an integrated mail/groupware
 server based on open commodity protocols, such as ESMTP, IMAP, POP3,
 LDAP, SSL, and HTTP. Courier provides ESMTP, IMAP, POP3, webmail, and
 mailing list services within a single, consistent framework. Individual
@@ -26,6 +48,41 @@ Information about the configuration for Courier can be found at:
 Dovecot is an open source IMAP and POP3 email server for Linux/UNIX-like
 systems, written with security primarily in mind. Dovecot claims that it
 is an excellent choice for both small and large installations.
+
+Dovecot is highly configurable and it comes with four [Tools](https://wiki2.dovecot.org/Tools)
+
+1. Dovecot's administration utility `doveadm`. It can be used to manage various parts of Dovecot,
+as well as access users' mailboxes.
+
+**Example:**
+
+        doveadm reload   # reload configuration
+        doveadm stop     # stop with all child processes
+
+        doveadm-config   # dump Dovecot configuration
+        doveadm log find # locate the log files used
+
+        doveadm who fr*  # Show authenticated sessions, filtered by username.
+                |username            # proto (pids)        (ips)
+                |fred                1 imap  (30091)       (127.0.0.1)
+        doveadm auth test -x service=imap -x rip=192.0.2.143 fred # imap authentication test for user fred, #assuming the user is connected from the host with the IP address 192.0.2.143.
+                |Password:
+                |passdb: john auth succeeded
+                |extra fields:
+                |  user=john
+
+
+2. Dovecot's configuration dumping utility `doveconf` reads and parses Dovecot's configuration files and converts them into a simpler format.
+
+**Example:**
+
+        doveconf -n # show sonly settings with non-default values.
+        doveconf -d # show only defaults
+        doveconf -h -f protocol=imap mail_plugins # hide settings name and filter for imap on mail_plugins
+
+        doveconf 1>/dev/null && echo $? # checks for config errors
+
+
 
 The configuration files of Dovecot can be found in `/etc/dovecot/conf.d`
 and we need to configure several parameters: authentication, mailbox
@@ -278,3 +335,5 @@ the user has deleted all mails, the index files again get updated to
 contain zero mails. When using Dovecot as a POP3 server, you might want
 to consider disabling or limiting the use of the index files using the
 `mbox_min_index_size` setting.
+
+There are a lot of other settings. Please refer to [dovecot-example.conf](https://dovecot.org/doc/dovecot-example.conf)
