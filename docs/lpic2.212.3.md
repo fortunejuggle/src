@@ -81,8 +81,10 @@ SSH protocol version 1
 
 SSH protocol version 2
 
--   This protocol version is the default and it supports DSA, ECDSA and
-    RSA keysssh. Forward security is provided through a Diffie-Hellman
+-   This protocol version is the default and it supports RSA, DSA ( OpenSSH 7.0
+    and greater similarly disable the ssh-dss (DSA) public key algorithm.
+    It is too weak and it is not recommend to use.), ECDSA and
+    ed25519 keysssh. Forward security is provided through a Diffie-Hellman
     key agreement. This key agreement results in a shared session key.
 
     The rest of the session is encrypted using a symmetric cipher,
@@ -92,6 +94,11 @@ SSH protocol version 2
     provided through a cryptographic message authentication code (
     hmac-md5, hmac-sha1, umac-64, umac-128, hmac-ripemd160,
     hmac-sha2-256 or hmac-sha2-512).
+
+**Note**
+    Secure Ciphers and Macs should be used.
+    Most of the Ciphers and Macs above are unsecure.
+    [Mozilla openssh](https://infosec.mozilla.org/guidelines/openssh)
 
 Finally, in both versions of the protocol, the server and the client
 enter an authentication dialog. The client tries to authenticate itself
@@ -103,13 +110,21 @@ possible, select SSH protocol version 2 as the only one to use.
 
 `ssh` implements the RSA authentication mechanism sshUser Keys
 automatically. The user creates an RSA key pair by running `ssh-keygen`.
+
+recommendations to generate SSH key file:
+
+        ssh-keygen -t rsa -b 4096
+        ssh-keygen -t ecdsa -b 521
+        ssh-keygen -t ed25519 # relative new so Support for it in clients is not yet universal.
+
+
 This stores the private key in `$HOME/.ssh/id_rsa` and the
 public key in `$HOME/.ssh/id_rsa.pub` in the user's home directory.
 The user should then copy the `$HOME/.ssh/id_rsa.pub` into
 the `$HOME/.ssh/authorized_keys` file on the remote machine:
 
         cat id_rsa.pub | ssh <user>@<server> 'cat >> ~/.ssh/authorized_keys'
-
+        ssh-copy-id -i id_rsa.pub <user>@<server>
 
 The `authorized_keys file` has only one key per line which can be very
 long. After this, the user can log in without giving the password.
