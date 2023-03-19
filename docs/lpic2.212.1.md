@@ -1,15 +1,15 @@
 ##  Configuring a router (212.1)
 
-Candidates should be able to configure a system to perform network
-address translation (NAT, IP masquerading) and state its significance in
-protecting a network. This objective includes configuring port
-redirection, managing filter rules and averting attacks.
+Candidates should be able to configure a system to forward IP packet
+and perform network address translation (NAT, IP masquerading) and state
+its significance in protecting a network. This objective includes configuring
+port redirection, managing filter rules and averting attacks.
 
 ###   Key Knowledge Areas
 
 - Network Address Translation (NAT)
 
-- iptables configuration files, tools and utilities
+- iptables and ip6tables configuration files, tools and utilities
 
 - Tools, commands and utilities to manage routing tables
 
@@ -22,15 +22,17 @@ on source or destination protocol, port and address
 
 - Save and reload filtering configurations
 
-- Awareness of ip6tables and filtering
-
 ###   Terms and Utilities
 
 -   `/proc/sys/net/ipv4`
 
+-   `/proc/sys/net/ipv6`
+
 -   `/etc/services`
 
 -   `iptables`
+
+-   `ip6tables`
 
 ##  Private Network Addresses
 
@@ -46,14 +48,14 @@ categories:
 
 - Category 1
 
- -   These hosts do not require access to the hosts of other IPCategory 1
+ -  These hosts do not require access to the hosts of other IPCategory 1
     enterprises or on the Internet itself; hosts within this category
     may use IP addresses that are unambiguous within an enterprise, but
     may be ambiguous between enterprises.
 
 - Category 2
 
-    -   These are hosts that need access to a limited set of outside
+    These are hosts that need access to a limited set of outside
     IPCategory 2 services (e.g., E-mail, FTP, netnews, remote login),
     which can be handled by mediating gateways (e.g., application layer
     gateways). For many hosts in this category, unrestricted external
@@ -64,7 +66,7 @@ categories:
 
 - Category 3
 
-    -   These hosts need network-layer access outside the enterprise
+    These hosts need network-layer access outside the enterprise
     IPCategory 3 (provided via IP connectivity); hosts in the last
     category require IP addresses that are globally unambiguous.
 
@@ -93,31 +95,6 @@ notation) the first block is nothing but a single class A network
 number, while the second block is a set of 16 contiguous class B network
 numbers and third block is a set of 256 contiguous class C network
 numbers.
-
-Even though IPv6 addresses are not likely to run out in the foreseeable
-future, the need for allocating private addresses has been recognized.
-RFC4193 describes address block fc00::/7, which is the approximate
-counterpart of the IPv4 private addresses described above.
-
-In addition to private IP addresses, IPv6 re-introduces the concept of
-link-local addresses, valid only for communications within the network
-segment (link) or the broadcast domain that the host is connected to.
-Routers do not forward packets with link-local addresses, because they
-are not guaranteed to be unique outside their network segment. In IPv4,
-the network range 169.254.0.0/16 was reserved for interfaces to allocate
-an IP address to themselves automatically. In practice, finding an IP
-address in this range on an interface generally means that DHCP
-allocation has failed, as link-local addressing is not generally used in
-IPv4 networks.
-
-In IPv6 networks, interfaces *always* allocate a link-local address in
-addition to potentially other configured or allocated IPv6 addresses.
-Therefore, IPv6 interfaces usually have more than one address.
-Link-local address are an integral part of the IPv6 protocol standard to
-facilitate neighbour discovery (NDP) and allocating globally unique IP
-addresses using DHCP6. Interfaces configured for IPv6 use part of their
-MAC address as a means to create a (hopefully) unique link-local address
-in the fe80::/64 range.
 
 ###   Network Address Translation (NAT)
 
@@ -982,13 +959,6 @@ be accomplished with the following commands:
     # or even better to make it persistent
     echo "net.ipv4.ip_forward = 1" >> /etc/sysctl.conf
 
-    ###############################################################################
-    # ENABLE FORWARDING IPv6
-    ###############################################################################
-    echo 1 > /proc/sys/net/ipv6/conf/all/forwarding
-    # or even better to make it persistent
-    echo "net.ipv6.conf.all.forwarding = 1" >> /etc/sysctl.conf
-
 ####  Saving And Restoring Firewall Rules
 
 Firewall rules can be saved and restored easily by using the commands
@@ -1308,16 +1278,115 @@ show the routing table where the `-n` will prevent resolving IP
 addresses and networks to names. Please look at the man pages for more
 interesting options.
 
+## IPv6
+
+Even though IPv6 addresses are not likely to run out in the foreseeable
+future, the need for allocating private addresses has been recognized.
+RFC4193 describes address block fc00::/7, which is the approximate
+counterpart of the IPv4 private addresses.
+
+In addition to private IP addresses, IPv6 re-introduces the concept of
+link-local addresses, valid only for communications within the network
+segment (link) or the broadcast domain that the host is connected to.
+Routers do not forward packets with link-local addresses, because they
+are not guaranteed to be unique outside their network segment. In IPv4,
+the network range 169.254.0.0/16 was reserved for interfaces to allocate
+an IP address to themselves automatically. In practice, finding an IP
+address in this range on an interface generally means that DHCP
+allocation has failed, as link-local addressing is not generally used in
+IPv4 networks.
+
+In IPv6 networks, interfaces *always* allocate a link-local address.
+Link-local IPv6 addresses have a prefix of fe80::/10 and a 64-bit suffix
+which can be computed and managed by the host itself without requiring
+additional networking components. IPv6 hosts can verify the uniqueness
+of their link-local addresses through a neighbor discovery process,
+which reaches out to the local network over `ICMPv6` in order to verify that
+the address is not already in use.
+
+Once a link-local address has been established, the IPv6 host attempts to
+determine if an IPv6-capable router is available through the use of a
+router solicitation message. If an IPv6 router is available it will
+respond with a router advertisement, which includes network configuration
+information such as a network prefix that is used for automatic address
+configuration using SLAAC or whether the host should obtain additional
+configuration information from a DHCPv6 server.
+
+Therefore, IPv6 interfaces usually have more than one address.
+Interfaces configured for IPv6 use part of their MAC address.
+
+### IPv6 Security
+
+Your network is, most likely, dual-stack and not IPv4-only. Therefore, regardless
+of whether your network has global IPv6 connectivity or not, most nodes on your
+network probably support IPv6. This means that nodes in your network may already
+employ IPv6 for local traffic, and they might also inadvertently employ IPv6 for
+non-local traffic if an attacker enables global IPv6 connectivity on your network.
+IPv6 might also lead to VPN traffic leakages if VPN implementations without appropriate
+IPv6 support are employed.
+
+As a result, even networks that are meant to be IPv4-only should enforce IPv6 security controls
+– if only to make sure that the network really supports only IPv4 (and not IPv6). These controls
+may range from mitigating attacks against automatic configuration and address resolution
+mechanisms, to enforcing IPv6 ACLs or blocking IPv6 traffic altogether at Layer 2.
+And luckily we have `ipv6tables`
+
 ##  ip6tables
 
 Ip6tables is the ipv6 equivalent of iptables. The syntax is identical to
 its ipv4 counterpart, except for the use of 128-bit addresses instead of
 32-bit addresses.
 
+**Examples**
+
+allow loopback interface:
+
+        ip6tables -A INPUT -i lo -j ACCEPT
+        ip6tables -A OUTPUT -o lo -j ACCEPT
+
+allow connections initiated from the host:
+
+        ip6tables -A INPUT -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
+
+allow connections from SSH clients:
+
+        ipv6tables -A INPUT -s <your address block>::/64 -m state --state NEW -m tcp -p tcp --dport 22 -j ACCEPT
+
+The Rule below is suitable for a DHCPv6 client:
+
+        ip6tables -A INPUT -m conntrack --ctstate NEW -m udp -p udp --dport 546 -d fe80::/64 -j ACCEPT
+
+drop all other incomming traffic:
+
+        ip6tables -P INPUT DROP
+        ip6tables -P OUTPUT DROP
+        ip6tables -P FORWARD DROP
+
+
+**The essential rules will depend on the network**
+
+If your system acts as a router then you need to enable ipv6 forwarding:
+
+    ###############################################################################
+    # ENABLE FORWARDING IPv6
+    ###############################################################################
+    echo 1 > /proc/sys/net/ipv6/conf/all/forwarding
+    # or even better to make it persistent
+    echo "net.ipv6.conf.all.forwarding = 1" >> /etc/sysctl.conf
+
+and then you also need some `ip6tables` rules:
+
 The following example allows ICMPv6:
 
         ip6tables -A INPUT -p icmpv6 -j ACCEPT
         ip6tables -A OUTPUT -p icmpv6 -j ACCEPT
+
+  **Note**
+    Allowing icmpv6 completly is not secure e.g icmpv6 137.
+
+Allow traffic from your internal hosts to the outside world:
+
+        ip6tables -A FORWARD -s <your address block>::/64 -j ACCEPT
 
 
 Iptables and ip6tables may be used simultanously. Refer to the
