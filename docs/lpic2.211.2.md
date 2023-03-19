@@ -22,13 +22,13 @@ headers and size
 
 ##  Procmail
 
-Procmail is a email filtering utility that may be used for
+Procmail is a **M**ail **D**elivery **A**gent with a email filtering utility that may be used for
 preprocessing and sorting of incoming mail. It can also be used to sort
 out email from mailinglists, to filter spam and send auto-replies.
 Procmail configuration is based on a file placed in the user's
 homedirectory. It is rarely run from the command line (except for
 testing purposes) but it's an autonomous program which is normally
-invoked by MTA's (Mail Transport Agent) like Sendmail or Postfix.
+invoked by MTA's (Mail Transfer Agent) like Sendmail or Postfix.
 
 Procmail follows the following scheme for reading its configuration (it
 reads both): `/etc/procmailrc`, `~/.procmailrc`
@@ -43,7 +43,7 @@ system-wide Procmail processing to a minimum and instead focus on using
 
 ##  Sieve
 
-Dovecot Sieve is a scripting language that may be used to
+Dovecot Sieve is a **M**ail **D**elivery **A**gent as a scripting language that may be used to
 preprocess and sort incoming email. It can also be used to sort out email
 from mailinglists, to filter spam and send auto-replies. To use sieve it
 should first be configured on the email servers. In this setup postfix
