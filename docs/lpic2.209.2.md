@@ -77,7 +77,7 @@ To run NFS, the following is needed:
 -   support for NFS (several options) must be built into the
     *kernel*
 
--   a *portmapper* must be running
+-   the *portmapper* or *rcpbind* must be running and the *portmap* needs to be restricted
 
 -   on systems with NFS-server support, an *NFS daemon* and a *mount
     daemon* must be active
@@ -183,7 +183,7 @@ that this portmapper is tcp wrapper compiled with tcp-wrapper support.
 If that line is missing, get a better portmapper or compile one
 yourself.
 
-A common security strategy is blocking incoming portmapper requests by
+A common security strategy is to make use of TCP Wrapper to block incoming portmapper requests by
 default, but allowing specific hosts to connect. This strategy will be
 described here.
 
@@ -229,10 +229,13 @@ To allow hosts with IP addresses in a subnet:
 This allows all hosts from 192.168.24.16 to 192.168.24.23 to connect
 (examples from [???](#Zadok01)).
 
-####  portmap and rpcbind
 
-Some linux distributions use portmap. Other linux distributions use
-rpcbind.
+**Note**
+TCP wrapper was very useful 20 years ago, when there were no firewalls in Linux. Because this is not the case for today and connection filtering should be done in network level or completely in application scope if it makes sense, TCP Wrapper has been at least deprecated, if it not already have been removed from the distros altogether.
+There is a kernel komponent eBPF (extented Berkeley Packet Filter). The eBPF allows configuration of per-cgroup, i.e. per-service or per-container access control. And that's a massive advantage because Classic Netfilter doesn't allow that.
+[eBPF](https://ebpf.io/what-is-ebpf)
+
+####  portmap and rpcbind
 
 The portmap daemon is replaced by rpcbind. Rpcbind has more features,
 like ipv6 support and nfs4 support.
@@ -509,8 +512,6 @@ fstab](#exportfstab) shows some of the functionality of `exportfs`.
   `exportfs -r`    reexport all directories
   `exportfs -a`    export or unexport all directories
   `exportfs -ua`   de-activate the export list (unexport all)
-
-  : Overview of `exportfs`
 
 **Note**
 Older (user-space) NFS systems may not have the `exportfs` command. On
@@ -1074,7 +1075,6 @@ files and software related to NFS.
 |  `rpc.mountd` |                               handles incoming (un)mount requests|
  | `/etc/exports`       |              defines which filesystems are exported|
 |`exportfs` command    |                  (un)exports filesystems|
-|  `showmount --exports`  |                     shows current exports|
 |  The `rpcinfo` command   |                    reports RPC information|
 |  The `nfsstat` command   |                    reports NFS statistics|
  | `showmount --all`   |                        shows active mounts to me (this host)|
@@ -1109,3 +1109,104 @@ are reported to be 10% faster than connections over `udp`, which does
 not allow sizes that large. Also, `tcp` is a more reliable protocol by
 design, compared to `udp`.
 
+
+NFS version 4 (NFSv4) offers some new features compared to its
+predecessors. Instead of exporting multiple filesystems, NFSv4 exports a
+single pseudo file system for each client. The origin for this pseudo
+file system may be from different filesystems, but this remains
+transparent to the client.
+
+###  Example: Setup NFSv4 only Server
+
+As per [man exports](https://linux.die.net/man/5/exports) the implications of using NFSv4 `fsid=0` or `fsid=root` is needed to export an explicit root of your pseudofilesystem, like this NFSv4 `/etc/exports` snippet:
+
+```bash
+        /srv/exports          10.0.1.0/24(rw,sync,crossmnt,fsid=0,no_subtree_check) 54.86.121.38/24(rw)  35.171.162.37(rw)
+        /srv/exports/backup   10-0-1-[53,122].local.domain(rw,sync,no_root_squash)  54.86.121.38/24(rw)  35.171.162.37(rw)
+        /srv/exports/tmp      10.0.1.0/24(rw,sync,all_squash,anonuid=99,anongid=99,no_subtree_check) 54.86.121.38/2(rw) 35.171.162.37(rw)
+```
+
+The first export line provides the pseudofilesystems root and is preventing clients to get access to data outside of this directory and allowing the NFS server to easily check if a client should be granted access to a file. Complexity is reduced while at the same time improving security.
+
+The directories that are defind in `/etc/exports` need to bee created on the host.
+
+```bash
+        mkdir -p /srv/exports/{tmp,backup}
+```
+
+Modify configuration files to disable NFSv2 and NFSv3 as documented for the distribution:
+
+**Note**
+
+`rpc.idmapd` isn't required unless you're doing ID mapping. Typically this is only going to occur if the server is joined to some sort of domain.
+`rpcbind`, `rpc-statd` and `rpc-statd-notify` are also not required for NFSv4 if backward compattibility for older NFS versions is not needed. The documantation states that services can be disabled.
+The `nfs-mountd` is referencing `rpc.mountd` and this can't be disabled because rpc.mountd manages kernel
+requests for information about exports, as needed.
+
+`systemctl disable rpc-statd.service rpcbind.service rpcbind.socket`
+`systemctl mask --now rpc-statd.service rpcbind.service rpcbind.socket`
+
+Start Sevices:
+
+         systemctl nfs-server start
+         systemctl nfs-idmapd start # optional
+
+
+`exportfs`
+```bash
+/srv/exports    10.0.1.0/24
+/srv/exports    54.86.121.38/24
+/srv/exports/backup
+                54.86.121.38/24
+/srv/exports/tmp
+                10.0.1.0/24
+/srv/exports/tmp
+                54.86.121.38/2
+/srv/exports/backup
+                10.0.1.[53,122].local.domain
+```
+**Note**
+`showmount` can't be used on nfsv4 only nfs-server
+
+
+Add Iptables Rule to allow client to connect to port 2049:
+
+```bash
+        iptables -A INPUT -s 10.0.1.122 -p tcp --dport 2049 -j ACCEPT
+
+```
+
+ **NFSv4client**
+
+
+modify fstab:
+
+        10.0.1.53:/  /mnt/exports  nfs4  sec=sys,noatime  0  0
+
+**Note**
+        sec=sys is used if we do not use `rpc.idmapd`
+
+Print network connections:
+
+```bash
+netstat -tnp
+```
+
+        Active Internet connections (w/o servers)
+        Proto Recv-Q Send-Q Local Address               Foreign Address             State       PID/Program name
+        tcp        0      0 10.0.1.122:681              10.0.1.53:2049              ESTABLISHED -
+        tcp        0    232 10.0.1.122:22               54.155.86.211:50659         ESTABLISHED 1586/sshd
+
+
+  **NFSv4 Ports**
+
+NFSv4 does not need to interact with rpcbind, lockd, and rpc-statd services. The mounting and locking protocols have been incorporated into the NFSv4 protocol. The nfs-mountd service is still required on the NFS server to set up the exports but is not involved in any over-the-wire operations. For NFSv4, we only use port 2049 for nfsd service.
+
+  **NFSv4 Delegation**
+
+NFS version 4 allows servers to delegate control of files to clients so that, in certain situations, clients may perform operations on files with minimal interaction with the server. NFSv4.1 extends this ability to other kinds of objects, particularly directories.
+
+NFS version 4 offers an extended set of attributes, including support form MS
+Windows ACL's. Although NFSv4 offers enhanced security features
+compared to previous versions of NFS, and has been around since 2003, it was never widely adopted.
+Even thought NFS version 3 is a familiar and well understood protocol, but with the demands being placed on storage by exponentially increasing data and compute growth, NFS version 3 has become increasingly difficult to deploy and manage. For use in new projects NFS version 4.2 should be evaluated and Users are encouraged to implement NFS version 4.2 which has been ratified in January 2010. [RFC](https://www.rfc-editor.org/search/rfc_search_detail.php?sortkey=Date&sorting=DESC&page=25&title=NFSv4&pubstatus[]=Any&pub_date_type=any)
